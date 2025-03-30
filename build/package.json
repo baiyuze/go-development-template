@@ -1,0 +1,11 @@
+{
+  "name": "lmes-create-widget",
+  "version": "1.0.1",
+  "main": "./www",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
