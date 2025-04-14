@@ -1,13 +1,13 @@
 package service
 
 import (
-	"app/internal/models"
+	"app/internal/model"
 
 	"gorm.io/gorm"
 )
 
 type UserService interface {
-	GetUserOne() (*models.User, error)
+	GetUserOne() (*model.User, error)
 }
 
 type userService struct {
@@ -18,8 +18,8 @@ func NewUserService(db *gorm.DB) UserService {
 	return &userService{db: db}
 }
 
-func (s *userService) GetUserOne() (*models.User, error) {
-	var user models.User
+func (s *userService) GetUserOne() (*model.User, error) {
+	var user model.User
 	if err := s.db.First(&user).Error; err != nil {
 		return nil, err
 	}

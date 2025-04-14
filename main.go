@@ -3,6 +3,7 @@ package main
 import (
 	"app/internal/container"
 	"app/internal/router"
+	"fmt"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -20,5 +21,8 @@ func main() {
 	router.RegisterRoutes(r, deps)
 
 	// 运行服务器
-	r.Run(":8888")
+	err := r.Run(":8888")
+	if err != nil {
+		fmt.Println(err)
+	}
 }

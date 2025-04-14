@@ -9,6 +9,6 @@ import (
 
 // RegisterRoutes 注册所有路由
 func RegisterRoutes(r *gin.Engine, deps *AppDependency) {
-	RegisterUserRoutes(r, deps, "user")
+	RegisterUserRoutes(r, deps)
 
 }

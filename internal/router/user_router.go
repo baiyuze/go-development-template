@@ -8,11 +8,12 @@ import (
 
 // RegisterRoutes 注册所有路由
 // internal/router/user_router.go
-func RegisterUserRoutes(r *gin.Engine, deps *AppDependency, groupPath string) {
+func RegisterUserRoutes(r *gin.Engine, deps *AppDependency) {
 
-	router := r.Group(groupPath)
+	router := r.Group("user")
 	userHandler := handler.NewUserHandler(deps.UserService)
 
 	router.GET("/", userHandler.HomeHandler)
-	// r.GET("/user/:id", handler.GetUser)
+	// 测试RPC
+	router.GET("/test", userHandler.TestRpc)
 }

@@ -1,7 +1,7 @@
 package repo
 
 import (
-	"app/internal/models"
+	"app/internal/model"
 	"log"
 
 	"gorm.io/driver/mysql"
@@ -19,13 +19,16 @@ func InitDB() *gorm.DB {
 		DontSupportRenameIndex:    true,  // 重命名索引时采用删除并新建的方式，MySQL 5.7 之前的数据库和 MariaDB 不支持重命名索引
 		DontSupportRenameColumn:   true,  // 用 `change` 重命名列，MySQL 8 之前的数据库和 MariaDB 不支持重命名列
 		SkipInitializeWithVersion: false, // 根据当前 MySQL 版本自动配置
-	}), &gorm.Config{})
+
+	}), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+	})
 	if err != nil {
 		log.Fatalf("failed to connect database: %v", err)
 	}
 
 	// 自动迁移模型（可选）
-	db.AutoMigrate(&models.User{}, &models.Version{})
+	db.AutoMigrate(&model.User{})
 
 	DB = db
 	return DB
