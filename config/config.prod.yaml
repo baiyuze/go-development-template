@@ -1,0 +1,9 @@
+service:
+  name: user-service
+  env: prod
+  port: 50051
+  region: cn-gz
+
+consul:
+  host: 127.0.0.1
+  port: 8500

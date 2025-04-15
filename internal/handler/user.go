@@ -1,6 +1,8 @@
 package handler
 
 import (
+	// AppContext "app/internal/app_ontext"
+
 	"app/internal/grpc/client"
 	"app/internal/service"
 	"fmt"
@@ -33,13 +35,9 @@ func (h *UserHandler) HomeHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-var userClient = client.NewHelloClient()
-
 func (h *UserHandler) TestRpc(c *gin.Context) {
-	// var user models.User
-	fmt.Printf("-----<")
-	userValid, err := userClient.SayHello("test")
 
+	userValid, err := client.SayHello("嘻嘻")
 	if err != nil {
 		fmt.Println("查询失败:", err.Error())
 	} else {

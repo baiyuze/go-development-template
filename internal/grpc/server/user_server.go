@@ -1,7 +1,7 @@
 package main
 
 import (
-	pb "app/api/proto"
+	pb "app/internal/grpc/proto"
 	"context"
 	"fmt"
 	"log"

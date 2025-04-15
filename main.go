@@ -1,6 +1,7 @@
 package main
 
 import (
+	"app/config"
 	"app/internal/container"
 	"app/internal/router"
 	"fmt"
@@ -11,12 +12,18 @@ import (
 
 func main() {
 	env := os.Getenv("ENV")
+	r := gin.New()
+	r.Use(gin.Logger(), gin.RecoveryWithWriter(os.Stderr))
+	envConfig, envErr := config.InitConfig()
+	if envErr != nil {
+		fmt.Println("配置错误", envErr)
+	}
+	fmt.Println(envConfig.Service, config.Cfg, "envConfig")
 	if env == "production" {
 		gin.SetMode(gin.ReleaseMode) // 生产环境
 	} else {
 		gin.SetMode(gin.DebugMode) // 开发环境
 	}
-	r := gin.Default()
 	deps := container.InitContainer()
 	router.RegisterRoutes(r, deps)
 
