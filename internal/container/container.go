@@ -20,6 +20,7 @@ var Deps *AppDependency
 // 初始化service
 func InitContainer() *AppDependency {
 	DB := repo.InitDB()
+	// 初始化grpc客户端
 	ctx := AppContext.InitClient()
 	userService := service.NewUserService(DB)
 	Deps = &AppDependency{

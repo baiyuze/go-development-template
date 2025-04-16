@@ -3,6 +3,7 @@ package main
 import (
 	"app/config"
 	"app/internal/container"
+	server "app/internal/grpc"
 	"app/internal/router"
 	"fmt"
 	"os"
@@ -24,7 +25,9 @@ func main() {
 	} else {
 		gin.SetMode(gin.DebugMode) // 开发环境
 	}
+	// 初始化grpc服务
 	deps := container.InitContainer()
+	go server.IntServer(deps)
 	router.RegisterRoutes(r, deps)
 
 	// 运行服务器

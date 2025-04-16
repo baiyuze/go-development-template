@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package proto;
 
-option go_package = "api/proto;proto";
+option go_package = "app/internal/grpc/proto;proto";
 
 service HelloService {
   rpc SayHello (HelloRequest) returns (HelloResponse);

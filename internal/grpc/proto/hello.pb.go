@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v5.29.3
-// source: api/proto/hello.proto
+// source: internal/grpc/proto/hello.proto
 
 package proto
 
@@ -30,7 +30,7 @@ type TokenRequest struct {
 
 func (x *TokenRequest) Reset() {
 	*x = TokenRequest{}
-	mi := &file_api_proto_hello_proto_msgTypes[0]
+	mi := &file_internal_grpc_proto_hello_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -42,7 +42,7 @@ func (x *TokenRequest) String() string {
 func (*TokenRequest) ProtoMessage() {}
 
 func (x *TokenRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_hello_proto_msgTypes[0]
+	mi := &file_internal_grpc_proto_hello_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -55,7 +55,7 @@ func (x *TokenRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TokenRequest.ProtoReflect.Descriptor instead.
 func (*TokenRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_hello_proto_rawDescGZIP(), []int{0}
+	return file_internal_grpc_proto_hello_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *TokenRequest) GetToken() string {
@@ -76,7 +76,7 @@ type UserResponse struct {
 
 func (x *UserResponse) Reset() {
 	*x = UserResponse{}
-	mi := &file_api_proto_hello_proto_msgTypes[1]
+	mi := &file_internal_grpc_proto_hello_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -88,7 +88,7 @@ func (x *UserResponse) String() string {
 func (*UserResponse) ProtoMessage() {}
 
 func (x *UserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_hello_proto_msgTypes[1]
+	mi := &file_internal_grpc_proto_hello_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -101,7 +101,7 @@ func (x *UserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserResponse.ProtoReflect.Descriptor instead.
 func (*UserResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_hello_proto_rawDescGZIP(), []int{1}
+	return file_internal_grpc_proto_hello_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *UserResponse) GetId() string {
@@ -134,7 +134,7 @@ type HelloRequest struct {
 
 func (x *HelloRequest) Reset() {
 	*x = HelloRequest{}
-	mi := &file_api_proto_hello_proto_msgTypes[2]
+	mi := &file_internal_grpc_proto_hello_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -146,7 +146,7 @@ func (x *HelloRequest) String() string {
 func (*HelloRequest) ProtoMessage() {}
 
 func (x *HelloRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_hello_proto_msgTypes[2]
+	mi := &file_internal_grpc_proto_hello_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -159,7 +159,7 @@ func (x *HelloRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HelloRequest.ProtoReflect.Descriptor instead.
 func (*HelloRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_hello_proto_rawDescGZIP(), []int{2}
+	return file_internal_grpc_proto_hello_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *HelloRequest) GetName() string {
@@ -178,7 +178,7 @@ type HelloResponse struct {
 
 func (x *HelloResponse) Reset() {
 	*x = HelloResponse{}
-	mi := &file_api_proto_hello_proto_msgTypes[3]
+	mi := &file_internal_grpc_proto_hello_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -190,7 +190,7 @@ func (x *HelloResponse) String() string {
 func (*HelloResponse) ProtoMessage() {}
 
 func (x *HelloResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_hello_proto_msgTypes[3]
+	mi := &file_internal_grpc_proto_hello_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -203,7 +203,7 @@ func (x *HelloResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HelloResponse.ProtoReflect.Descriptor instead.
 func (*HelloResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_hello_proto_rawDescGZIP(), []int{3}
+	return file_internal_grpc_proto_hello_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *HelloResponse) GetGreeting() string {
@@ -213,11 +213,11 @@ func (x *HelloResponse) GetGreeting() string {
 	return ""
 }
 
-var File_api_proto_hello_proto protoreflect.FileDescriptor
+var File_internal_grpc_proto_hello_proto protoreflect.FileDescriptor
 
-const file_api_proto_hello_proto_rawDesc = "" +
+const file_internal_grpc_proto_hello_proto_rawDesc = "" +
 	"\n" +
-	"\x15api/proto/hello.proto\x12\x05proto\"$\n" +
+	"\x1finternal/grpc/proto/hello.proto\x12\x05proto\"$\n" +
 	"\fTokenRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\"H\n" +
 	"\fUserResponse\x12\x0e\n" +
@@ -231,28 +231,28 @@ const file_api_proto_hello_proto_rawDesc = "" +
 	"\fHelloService\x125\n" +
 	"\bSayHello\x12\x13.proto.HelloRequest\x1a\x14.proto.HelloResponse2F\n" +
 	"\vUserService\x127\n" +
-	"\vVerifyToken\x12\x13.proto.TokenRequest\x1a\x13.proto.UserResponseB\x11Z\x0fapi/proto;protob\x06proto3"
+	"\vVerifyToken\x12\x13.proto.TokenRequest\x1a\x13.proto.UserResponseB\x1fZ\x1dapp/internal/grpc/proto;protob\x06proto3"
 
 var (
-	file_api_proto_hello_proto_rawDescOnce sync.Once
-	file_api_proto_hello_proto_rawDescData []byte
+	file_internal_grpc_proto_hello_proto_rawDescOnce sync.Once
+	file_internal_grpc_proto_hello_proto_rawDescData []byte
 )
 
-func file_api_proto_hello_proto_rawDescGZIP() []byte {
-	file_api_proto_hello_proto_rawDescOnce.Do(func() {
-		file_api_proto_hello_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_proto_hello_proto_rawDesc), len(file_api_proto_hello_proto_rawDesc)))
+func file_internal_grpc_proto_hello_proto_rawDescGZIP() []byte {
+	file_internal_grpc_proto_hello_proto_rawDescOnce.Do(func() {
+		file_internal_grpc_proto_hello_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_internal_grpc_proto_hello_proto_rawDesc), len(file_internal_grpc_proto_hello_proto_rawDesc)))
 	})
-	return file_api_proto_hello_proto_rawDescData
+	return file_internal_grpc_proto_hello_proto_rawDescData
 }
 
-var file_api_proto_hello_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_api_proto_hello_proto_goTypes = []any{
+var file_internal_grpc_proto_hello_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_internal_grpc_proto_hello_proto_goTypes = []any{
 	(*TokenRequest)(nil),  // 0: proto.TokenRequest
 	(*UserResponse)(nil),  // 1: proto.UserResponse
 	(*HelloRequest)(nil),  // 2: proto.HelloRequest
 	(*HelloResponse)(nil), // 3: proto.HelloResponse
 }
-var file_api_proto_hello_proto_depIdxs = []int32{
+var file_internal_grpc_proto_hello_proto_depIdxs = []int32{
 	2, // 0: proto.HelloService.SayHello:input_type -> proto.HelloRequest
 	0, // 1: proto.UserService.VerifyToken:input_type -> proto.TokenRequest
 	3, // 2: proto.HelloService.SayHello:output_type -> proto.HelloResponse
@@ -264,26 +264,26 @@ var file_api_proto_hello_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_api_proto_hello_proto_init() }
-func file_api_proto_hello_proto_init() {
-	if File_api_proto_hello_proto != nil {
+func init() { file_internal_grpc_proto_hello_proto_init() }
+func file_internal_grpc_proto_hello_proto_init() {
+	if File_internal_grpc_proto_hello_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_proto_hello_proto_rawDesc), len(file_api_proto_hello_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_grpc_proto_hello_proto_rawDesc), len(file_internal_grpc_proto_hello_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   2,
 		},
-		GoTypes:           file_api_proto_hello_proto_goTypes,
-		DependencyIndexes: file_api_proto_hello_proto_depIdxs,
-		MessageInfos:      file_api_proto_hello_proto_msgTypes,
+		GoTypes:           file_internal_grpc_proto_hello_proto_goTypes,
+		DependencyIndexes: file_internal_grpc_proto_hello_proto_depIdxs,
+		MessageInfos:      file_internal_grpc_proto_hello_proto_msgTypes,
 	}.Build()
-	File_api_proto_hello_proto = out.File
-	file_api_proto_hello_proto_goTypes = nil
-	file_api_proto_hello_proto_depIdxs = nil
+	File_internal_grpc_proto_hello_proto = out.File
+	file_internal_grpc_proto_hello_proto_goTypes = nil
+	file_internal_grpc_proto_hello_proto_depIdxs = nil
 }

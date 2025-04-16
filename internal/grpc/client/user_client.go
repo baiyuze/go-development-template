@@ -11,7 +11,7 @@ import (
 func SayHello(token string) (*pb.HelloResponse, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	req := &pb.HelloRequest{Name: "Alice"}
+	req := &pb.HelloRequest{Name: "吃啥"}
 	resp, err := container.Deps.Context.UserClient.SayHello(ctx, req)
 	if err != nil {
 		log.Fatalf("调用失败: %v", err)
