@@ -1,18 +1,3 @@
-明白了！你在 internal/grpc/ 目录下组织了如下结构：
-
-internal/grpc/
-├── client/       // gRPC 客户端封装
-├── container/    // 注入 gRPC 所需依赖
-├── handler/      // 实现 proto 定义的服务接口（业务入口）
-├── proto/        // .proto 文件及生成代码
-├── register.go   // 注册 gRPC 服务函数（可选：用于统一注册）
-└── server.go     // 启动 gRPC 服务监听器
-
-非常棒的结构！这已经非常接近实际微服务工程中的模块划分了。
-
-⸻
-
-📝 那我来根据这个目录结构，重新帮你写一份更专业清晰的 README.md
 
 # 🚀 Go 微服务框架模板（Gin + gRPC + Consul）
 
