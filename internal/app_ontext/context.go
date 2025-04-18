@@ -9,11 +9,14 @@ import (
 	"log"
 
 	"github.com/hashicorp/consul/api"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
 
 type AppContext struct {
-	Config     *dto.Config
+	Config *dto.Config
+	Logger *zap.Logger
+
 	UserClient pb.HelloServiceClient
 	UserConn   *grpc.ClientConn
 }
@@ -62,12 +65,13 @@ func newClient[T any](serverName string, constructor func(grpc.ClientConnInterfa
 	return client, conn
 }
 
-func InitClient() *AppContext {
+func InitClient(logger *zap.Logger) *AppContext {
 	client, conn := newClient("user-service", pb.NewHelloServiceClient)
 	return &AppContext{
 		Config:     config.Cfg,
 		UserClient: client,
 		UserConn:   conn,
+		Logger:     logger,
 	}
 	// return Context
 }
