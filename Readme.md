@@ -149,7 +149,9 @@ ENV	切换运行模式	development / production
 ⸻
 
 ## 📌 后续规划（TODO）
-	•	添加用户鉴权中间件（JWT）
+
+	-	添加用户鉴权中间件（JWT）
+	- kafka异步订阅消息
 
 ⸻
 
