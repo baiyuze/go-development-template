@@ -1,6 +1,5 @@
 
 ## 🚀 Go 微服务框架模板（Gin + gRPC + Consul）
-⸻
 
 这是一个基于 Go 开发的微服务骨架，采用 Gin + gRPC + Consul + 自定义依赖注入容器 的架构，支持双协议（HTTP + gRPC）访问，适合构建高可维护的微服务系统。
 
@@ -76,7 +75,6 @@ go run main.go
 ## 🧬 代码解析
 
 main.go 入口文件
-```
 在 main.go 中，程序主要做了以下几项操作：
 	1.	环境变量与日志配置：
 	•	通过 os.Getenv("ENV") 获取当前环境（开发环境或生产环境），并相应配置 gin 的日志模式（开发模式或生产模式）。
@@ -98,7 +96,6 @@ main.go 入口文件
 	•	使用 router.RegisterRoutes() 注册 HTTP 路由。
 	6.	服务器运行：
 	•	最后，调用 r.Run(":8888") 启动 Gin HTTP 服务器。
-```
 ⸻
 
 ## 🛰 gRPC 模块说明
