@@ -1,11 +1,11 @@
 
-🚀 Go 微服务框架模板（Gin + gRPC + Consul）
+## 🚀 Go 微服务框架模板（Gin + gRPC + Consul）
 
 这是一个基于 Go 开发的微服务骨架，采用 Gin + gRPC + Consul + 自定义依赖注入容器 的架构，支持双协议（HTTP + gRPC）访问，适合构建高可维护的微服务系统。
 
 ⸻
 
-🧱 项目结构总览
+## 🧱 项目结构总览
 ```
 internal/
 ├── app_context/           # 上下文管理（如追溯ID等）
@@ -52,7 +52,7 @@ internal/
 
 ⸻
 
-🧪 启动方式
+## 🧪 启动方式
 
 1. 安装依赖
 
@@ -72,7 +72,7 @@ go run main.go
 
 ⸻
 
-🧬 代码解析
+## 🧬 代码解析
 
 main.go 入口文件
 ```
@@ -100,7 +100,7 @@ main.go 入口文件
 ```
 ⸻
 
-🛰 gRPC 模块说明
+## 🛰 gRPC 模块说明
 ```
 模块名	说明
 client/	封装 gRPC 客户端调用逻辑，支持复用连接、负载均衡等
@@ -114,7 +114,7 @@ server.go	启动 gRPC 服务监听端口，注册健康检查、服务注册到 
 
 ⸻
 
-📦 RESTful API 示例（Gin）
+## 📦 RESTful API 示例（Gin）
 
 GET 请求
 ```
@@ -130,7 +130,7 @@ http://localhost:8888/user/test
 
 ⸻
 
-🧬 gRPC 接口测试
+## 🧬 gRPC 接口测试
 
 使用 grpcurl 命令行工具进行测试：
 ```
@@ -140,7 +140,7 @@ grpcurl -plaintext localhost:50051 app.HelloService.SayHello
 
 ⸻
 
-🔧 环境变量支持
+## 🔧 环境变量支持
 
 环境变量	描述	示例值
 ENV	切换运行模式	development / production
@@ -149,7 +149,7 @@ ENV	切换运行模式	development / production
 
 ⸻
 
-📌 后续规划（TODO）
+## 📌 后续规划（TODO）
 	•	添加用户鉴权中间件（JWT）
 
 ⸻
