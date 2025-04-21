@@ -75,27 +75,27 @@ go run main.go
 ## 🧬 代码解析
 
 main.go 入口文件
-在 main.go 中，程序主要做了以下几项操作：
-	1.	环境变量与日志配置：
-	•	通过 os.Getenv("ENV") 获取当前环境（开发环境或生产环境），并相应配置 gin 的日志模式（开发模式或生产模式）。
-	•	使用 zap 日志库，根据不同环境初始化不同的日志配置。
-	2.	中间件配置：
-	•	配置了一些常用的中间件，如：
-	•	Trace：追溯请求 ID，用于日志追踪。
-	•	AuthWhiteList：认证白名单，用于跳过特定的认证检查。
-	•	Ginzap：在开发环境中输出日志到终端。
-	•	RecoveryWithZap：自动恢复 panic 错误，并输出日志。
-	•	Logger：自定义的日志中间件。
-	3.	配置初始化：
-	•	使用 config.InitConfig() 加载配置文件。如果加载失败，将会记录错误信息。
-	4.	gRPC 服务启动：
-	•	通过 container.InitContainer() 初始化 gRPC 服务的依赖注入容器。
-	•	启动 gRPC 服务（server.IntServer()）。
-	5.	gRPC 客户端初始化与路由注册：
-	•	使用 container.InitClient() 初始化 gRPC 客户端。
-	•	使用 router.RegisterRoutes() 注册 HTTP 路由。
-	6.	服务器运行：
-	•	最后，调用 r.Run(":8888") 启动 Gin HTTP 服务器。
+- 在 main.go 中，程序主要做了以下几项操作：
+	- 1.	环境变量与日志配置：
+	  - •	通过 os.Getenv("ENV") 获取当前环境（开发环境或生产环境），并相应配置 gin 的日志模式（开发模式或生产模式）。
+		- •	使用 zap 日志库，根据不同环境初始化不同的日志配置。
+	- 2.	中间件配置：
+	  - •	配置了一些常用的中间件，如：
+	  - •	Trace：追溯请求 ID，用于日志追踪。
+	  - •	AuthWhiteList：认证白名单，用于跳过特定的认证检查。
+	  - •	Ginzap：在开发环境中输出日志到终端。
+	  - •	RecoveryWithZap：自动恢复 panic 错误，并输出日志。
+	  - •	Logger：自定义的日志中间件。
+	- 3.	配置初始化：
+	  - •	使用 config.InitConfig() 加载配置文件。如果加载失败，将会记录错误信息。
+	- 4.	gRPC 服务启动：
+	  - •	通过 container.InitContainer() 初始化 gRPC 服务的依赖注入容器。
+	  - •	启动 gRPC 服务（server.IntServer()）。
+	- 5.	gRPC 客户端初始化与路由注册：
+	  - •	使用 container.InitClient() 初始化 gRPC 客户端。
+	  - •	使用 router.RegisterRoutes() 注册 HTTP 路由。
+	- 6.	服务器运行：
+	  - •	最后，调用 r.Run(":8888") 启动 Gin HTTP 服务器。
 ⸻
 
 ## 🛰 gRPC 模块说明
