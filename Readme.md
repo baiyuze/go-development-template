@@ -1,7 +1,7 @@
 
 ## 🚀 Go 微服务框架模板（Gin + gRPC + Consul）
 
-这是一个基于 Go 开发的微服务骨架，采用 Gin + gRPC + Consul + 自定义依赖注入容器 的架构，支持双协议（HTTP + gRPC）访问，适合构建高可维护的微服务系统。
+这是一个基于 Go 开发的微服务骨架，采用 Gin + GORM + Mysql + gRPC + Consul + 自定义依赖注入容器 的架构，支持双协议（HTTP + gRPC）访问，适合构建高可维护的微服务系统。
 
 ⸻
 
