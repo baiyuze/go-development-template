@@ -10,6 +10,8 @@ import (
 	"os"
 	"time"
 
+	zapLog "app/internal/common/logger"
+
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -17,12 +19,13 @@ import (
 
 func main() {
 	env := os.Getenv("ENV")
+	isProduction := env == "production"
 	r := gin.New()
-	var logger *zap.Logger
-	if env == "production" {
-		gin.SetMode(gin.ReleaseMode) // 生产环境
-		logger, _ = zap.NewProduction()
 
+	var logger *zap.Logger
+	if isProduction {
+		gin.SetMode(gin.ReleaseMode) // 生产环境
+		logger, _ = zapLog.InitLogger()
 	} else {
 		gin.SetMode(gin.DebugMode) // 开发环境
 		logger, _ = zap.NewDevelopment()
@@ -30,8 +33,13 @@ func main() {
 	defer logger.Sync()
 	// 追溯Id
 	r.Use(middleware.Trace)
-	r.Use(ginzap.Ginzap(logger, time.RFC3339, true))
-	// r.Use(ginzap.RecoveryWithZap(logger, true))
+	// 认证白名单
+	r.Use(middleware.AuthWhiteList)
+	// 输出日志到终端显示
+	if !isProduction {
+		r.Use(ginzap.Ginzap(logger, time.RFC3339, true))
+	}
+	// recover恢复
 	r.Use(middleware.RecoveryWithZap(logger))
 	middleLog := middleware.NewLogger(logger)
 	// 日志
@@ -40,12 +48,17 @@ func main() {
 	if envErr != nil {
 		logger.Error("配置错误", zap.String("traceId", envErr.Error()))
 	}
-	fmt.Println(envConfig.Service, config.Cfg, "envConfig")
 
+	fmt.Println(envConfig.Service, config.Cfg, "envConfig")
+	go func() {
+		serverDeps := container.InitContainer(logger)
+		go server.IntServer(serverDeps)
+	}()
+
+	// 初始化GRPC客户端
+	clientDeps := container.InitClient(logger)
 	// 初始化grpc服务
-	deps := container.InitContainer(logger)
-	go server.IntServer(deps)
-	router.RegisterRoutes(r, deps)
+	router.RegisterRoutes(r, clientDeps)
 
 	// 运行服务器
 	err := r.Run(":8888")

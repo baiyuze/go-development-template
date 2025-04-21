@@ -5,6 +5,7 @@ import (
 )
 
 func RegisterToConsul() {
+
 	config := api.DefaultConfig()
 	client, _ := api.NewClient(config)
 
@@ -12,9 +13,9 @@ func RegisterToConsul() {
 		ID:      "user-service",
 		Name:    "user-service",
 		Port:    50051,
-		Address: "localhost",
+		Address: "127.0.0.1",
 		Check: &api.AgentServiceCheck{
-			GRPC:     "localhost:50051",
+			GRPC:     "127.0.0.1:50051",
 			Interval: "10s",
 		},
 	}

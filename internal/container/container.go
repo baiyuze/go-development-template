@@ -23,8 +23,22 @@ var Deps *AppDependency
 func InitContainer(logger *zap.Logger) *AppDependency {
 	DB := repo.InitDB()
 	// 初始化grpc客户端
-	ctx := AppContext.InitClient(logger)
+
 	userService := service.NewUserService(DB)
+	Deps = &AppDependency{
+		UserService: userService,
+		Logger:      logger,
+	}
+	return Deps
+}
+
+// 初始化GRPC 客户端
+func InitClient(logger *zap.Logger) *AppDependency {
+	DB := repo.InitDB()
+	// 初始化grpc客户端
+
+	userService := service.NewUserService(DB)
+	ctx := AppContext.InitClient(logger)
 	Deps = &AppDependency{
 		UserService: userService,
 		Context:     ctx,

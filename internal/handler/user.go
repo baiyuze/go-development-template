@@ -7,7 +7,6 @@ import (
 	"app/internal/common/logger"
 	"app/internal/grpc/client"
 	"app/internal/service"
-	"errors"
 	"fmt"
 	"net/http"
 
@@ -35,10 +34,9 @@ func (h *UserHandler) HomeHandler(c *gin.Context) {
 	logger.Info("测试")
 	// var user models.User
 	user, err := h.service.GetUserOne()
-	errs.MustNoErr(errors.New("这是一个新错误"), "错误了啊")
 
 	if err != nil {
-		fmt.Println("查询失败:", err.Error())
+		errs.MustNoErr(err, "错误了啊")
 	} else {
 		fmt.Printf("查询到的用户: %+v\n", user)
 	}

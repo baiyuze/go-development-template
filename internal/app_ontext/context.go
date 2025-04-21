@@ -66,6 +66,7 @@ func newClient[T any](serverName string, constructor func(grpc.ClientConnInterfa
 }
 
 func InitClient(logger *zap.Logger) *AppContext {
+
 	client, conn := newClient("user-service", pb.NewHelloServiceClient)
 	return &AppContext{
 		Config:     config.Cfg,
