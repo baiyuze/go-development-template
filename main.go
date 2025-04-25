@@ -31,17 +31,20 @@ func main() {
 		logger, _ = zap.NewDevelopment()
 	}
 	defer logger.Sync()
-	// 追溯Id
-	r.Use(middleware.Trace)
-	// 认证白名单
-	r.Use(middleware.AuthWhiteList)
-	// 输出日志到终端显示
 	if !isProduction {
+		// 输出日志到终端显示
 		r.Use(ginzap.Ginzap(logger, time.RFC3339, true))
 	}
 	// recover恢复
 	r.Use(middleware.RecoveryWithZap(logger))
 	middleLog := middleware.NewLogger(logger)
+
+	// 追溯Id
+	r.Use(middleware.Trace)
+	// 认证白名单
+	r.Use(middleware.AuthWhiteList)
+	r.Use(middleware.Jwt)
+
 	// 日志
 	r.Use(middleLog.Logger)
 	envConfig, envErr := config.InitConfig()

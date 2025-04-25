@@ -15,5 +15,10 @@ func NewWhiteList(context *gin.Context) *WhiteList {
 
 // AuthWhiteList 认证白名单
 func AuthWhiteList(c *gin.Context) {
+	whiteList := []string{
+		"public",
+		"user/login",
+	}
+	c.Set("whiteList", whiteList)
 	c.Next()
 }
