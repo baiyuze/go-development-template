@@ -37,8 +37,8 @@ func InitClient(logger *zap.Logger) *AppDependency {
 	DB := repo.InitDB()
 	// 初始化grpc客户端
 
-	userService := service.NewUserService(DB)
 	ctx := AppContext.InitClient(logger)
+	userService := service.NewUserService(DB)
 	Deps = &AppDependency{
 		UserService: userService,
 		Context:     ctx,

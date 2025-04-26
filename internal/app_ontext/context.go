@@ -29,7 +29,9 @@ type ServiceDiscovery struct {
 
 // 初始化发现器
 func NewServiceDiscovery() *ServiceDiscovery {
+
 	config := api.DefaultConfig()
+	config.Address = "consul.sanyang.life:8500"
 	client, err := api.NewClient(config)
 	if err != nil {
 		log.Fatalf("创建 Consul 客户端失败: %v", err)
@@ -59,7 +61,6 @@ func newClient[T any](serverName string, constructor func(grpc.ClientConnInterfa
 	target, err := discover.GetServiceAddress(serverName)
 	if err != nil {
 		log.Fatalf("获取TargetName失败: %v", err)
-		fmt.Printf("错误：", err)
 	}
 	client, conn := utils.GrpcFactory[T](target, constructor)
 	return client, conn
