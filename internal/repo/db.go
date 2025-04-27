@@ -13,7 +13,7 @@ var DB *gorm.DB // 全局变量
 
 func InitDB() *gorm.DB {
 
-	// dsn := "dev:123456@tcp(192.168.2.206:3306)/front_resource_test?charset=utf8mb4&parseTime=True&loc=Local"
+	// dsn := "guang:mysqlpassword666@tcp(data.sanyang.life::3307)/front_resource_test?charset=utf8mb4&parseTime=True&loc=Local"
 	SQL_URL := os.Getenv("SQL_URL")
 	dsn := SQL_URL
 	db, err := gorm.Open(mysql.New(mysql.Config{

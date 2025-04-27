@@ -1,27 +1,25 @@
 package server
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/hashicorp/consul/api"
 )
 
 func RegisterToConsul() {
 
 	config := api.DefaultConfig()
-	addr := os.Getenv("ADDR")
-	fmt.Println(addr, "addraddraddr")
-	config.Address = addr
+	// grpc等待时间过长 不使用
+	// addr := os.Getenv("ADDR")
+	// fmt.Println(addr, "addraddraddr")
+	// config.Address = addr
 	client, _ := api.NewClient(config)
 
 	reg := &api.AgentServiceRegistration{
 		ID:      "user-service",
 		Name:    "user-service",
 		Port:    50051,
-		Address: "192.168.2.136",
+		Address: "127.0.0.1",
 		Check: &api.AgentServiceCheck{
-			GRPC:     "192.168.2.136:50051",
+			GRPC:     "127.0.0.1:50051",
 			Interval: "10s",
 		},
 	}

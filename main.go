@@ -2,6 +2,7 @@ package main
 
 import (
 	"app/config"
+	AppContext "app/internal/app_ontext"
 	"app/internal/container"
 	server "app/internal/grpc"
 	"app/internal/middleware"
@@ -53,15 +54,18 @@ func main() {
 	}
 
 	fmt.Println(envConfig.Service, config.Cfg, "envConfig")
+	Deps := container.InitContainer(logger)
 	go func() {
-		serverDeps := container.InitContainer(logger)
-		go server.IntServer(serverDeps)
+		go server.IntServer(Deps)
 	}()
 
 	// 初始化GRPC客户端
-	clientDeps := container.InitClient(logger)
+	// clientDeps := container.InitClient(logger)
+
+	AppContext.InitClient(logger)
+
 	// 初始化grpc服务
-	router.RegisterRoutes(r, clientDeps)
+	router.RegisterRoutes(r, Deps)
 
 	// 运行服务器
 	err := r.Run(":8888")

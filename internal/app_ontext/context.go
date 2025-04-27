@@ -14,9 +14,8 @@ import (
 )
 
 type AppContext struct {
-	Config *dto.Config
-	Logger *zap.Logger
-
+	Config     *dto.Config
+	Logger     *zap.Logger
 	UserClient pb.HelloServiceClient
 	UserConn   *grpc.ClientConn
 }
@@ -25,13 +24,13 @@ type ServiceDiscovery struct {
 	client *api.Client
 }
 
-// var AppContext *AppContext
+var Context *AppContext
 
 // 初始化发现器
 func NewServiceDiscovery() *ServiceDiscovery {
 
 	config := api.DefaultConfig()
-	config.Address = "consul.sanyang.life:8500"
+	// Grpc 等待时间不能过长，不然不能访问
 	client, err := api.NewClient(config)
 	if err != nil {
 		log.Fatalf("创建 Consul 客户端失败: %v", err)
@@ -69,11 +68,12 @@ func newClient[T any](serverName string, constructor func(grpc.ClientConnInterfa
 func InitClient(logger *zap.Logger) *AppContext {
 
 	client, conn := newClient("user-service", pb.NewHelloServiceClient)
-	return &AppContext{
+	fmt.Println(client, conn, "-------InitClient---->")
+	Context = &AppContext{
 		Config:     config.Cfg,
 		UserClient: client,
 		UserConn:   conn,
 		Logger:     logger,
 	}
-	// return Context
+	return Context
 }

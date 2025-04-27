@@ -44,7 +44,7 @@ func (h *UserHandler) HomeHandler(c *gin.Context) {
 }
 
 func (h *UserHandler) TestRpc(c *gin.Context) {
-
+	fmt.Println("-==========================>>>>>>>>>")
 	userValid, err := client.SayHello("嘻嘻")
 	if err != nil {
 		fmt.Println("查询失败:", err.Error())

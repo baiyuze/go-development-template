@@ -2,7 +2,6 @@
 package container
 
 import (
-	AppContext "app/internal/app_ontext"
 	"app/internal/repo"
 	"app/internal/service"
 
@@ -12,7 +11,6 @@ import (
 
 type AppDependency struct {
 	DB          *gorm.DB
-	Context     *AppContext.AppContext
 	UserService service.UserService
 	Logger      *zap.Logger
 }
@@ -33,16 +31,12 @@ func InitContainer(logger *zap.Logger) *AppDependency {
 }
 
 // 初始化GRPC 客户端
-func InitClient(logger *zap.Logger) *AppDependency {
-	DB := repo.InitDB()
-	// 初始化grpc客户端
-
-	ctx := AppContext.InitClient(logger)
-	userService := service.NewUserService(DB)
-	Deps = &AppDependency{
-		UserService: userService,
-		Context:     ctx,
-		Logger:      logger,
-	}
-	return Deps
-}
+// func InitClient(logger *zap.Logger) *AppDependency {
+// 	DB := repo.InitDB()
+// 	userService := service.NewUserService(DB)
+// 	Deps = &AppDependency{
+// 		UserService: userService,
+// 		Logger:      logger,
+// 	}
+// 	return Deps
+// }
