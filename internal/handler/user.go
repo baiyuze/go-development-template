@@ -6,35 +6,38 @@ import (
 	errs "app/internal/common/error"
 	"app/internal/common/logger"
 	"app/internal/grpc/client"
+	"app/internal/grpc/container"
+
 	"app/internal/service"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/dig"
 )
 
 type UserHandler struct {
 	service service.UserService
+	clients *container.Clients
 }
 
-func NewUserHandler(service service.UserService) *UserHandler {
-	return &UserHandler{service: service}
+func NewUserHandler(service service.UserService, clients *container.Clients) *UserHandler {
+	return &UserHandler{
+		service: service,
+		clients: clients,
+	}
+}
+
+func ProviderUserHandler(container *dig.Container) {
+	container.Provide(NewUserHandler)
 }
 
 // HomeHandler 处理首页请求
 func (h *UserHandler) HomeHandler(c *gin.Context) {
 	logger := logger.GetLogger(c)
-	// l, exists := c.Get("logger")
-	// if !exists {
-	// 	c.JSON(500, gin.H{"error": "logger not found"})
-	// 	return
-	// }
 
-	// logger := l.(*zap.Logger) // 类型断言
 	logger.Info("测试")
-	// var user models.User
 	user, err := h.service.GetUserOne()
-
 	if err != nil {
 		errs.MustNoErr(err, "错误了啊")
 	} else {
@@ -44,8 +47,8 @@ func (h *UserHandler) HomeHandler(c *gin.Context) {
 }
 
 func (h *UserHandler) TestRpc(c *gin.Context) {
-	fmt.Println("-==========================>>>>>>>>>")
-	userValid, err := client.SayHello("嘻嘻")
+
+	userValid, err := client.SayHello(h.clients)
 	if err != nil {
 		fmt.Println("查询失败:", err.Error())
 	} else {

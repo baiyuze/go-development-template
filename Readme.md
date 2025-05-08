@@ -1,166 +1,152 @@
+# 🚀 Go 微服务框架模板（Gin + gRPC + Consul + dig）
 
-## 🚀 Go 微服务框架模板（Gin + gRPC + Consul）
+这是一个现代化、高可维护性的 Go 微服务架构模板，基于 Gin、gRPC、GORM、Consul，并通过 [uber-go/dig](https://github.com/uber-go/dig) 实现依赖注入，提升模块解耦与测试友好性，支持 HTTP 与 gRPC 双协议访问。
 
-这是一个基于 Go 开发的微服务骨架，采用 Gin + GORM + Mysql + gRPC + Consul + 自定义依赖注入容器 的架构，支持双协议（HTTP + gRPC）访问，适合构建高可维护的微服务系统。
+---
 
-⸻
-
-## 🧱 项目结构总览
+## 🧱 项目结构概览
 ```
 internal/
-├── app_context/           # 上下文管理（如追溯ID等）
-│   └── context.go         # 管理请求上下文的逻辑
-├── common/                # 公共组件（如错误处理、日志）
-│   ├── error/             # 错误处理
-│   └── logger/            # 日志初始化与配置
-│       └── logger.go      # 日志相关工具
-├── container/             # 依赖注入容器（服务实例构造）
-│   └── container.go       # 依赖注入初始化与管理
-├── dto/                   # 数据传输对象（DTO），用于接口数据的转换
-├── grpc/                  # gRPC 相关逻辑与配置
-│   ├── client/            # gRPC 客户端封装（服务间调用）
-│   │   └── user_client.go # gRPC 客户端实现
-│   ├── container/         # gRPC 层注入（依赖管理）
-│   │   └── container.go   # gRPC 服务所需依赖的注入
-│   ├── handler/           # 实现 proto 定义的服务逻辑
-│   │   └── hello_handler.go # 实现 gRPC 服务的逻辑
-│   ├── proto/             # gRPC proto 文件及生成的代码
-│   │   ├── hello.proto    # proto 文件定义
-│   │   ├── hello.pb.go    # 通过 proto 生成的代码
-│   │   └── hello_grpc.pb.go # 生成的 gRPC 服务代码
-│   ├── register.go        # 注册 gRPC handler 到服务（可选）
-│   └── server.go          # 启动 gRPC 服务（监听与注册）
-├── handler/               # HTTP 请求处理逻辑
-│   └── user.go            # 用户相关的 HTTP 处理器
-├── middleware/            # 中间件逻辑（如日志、认证等）
-├── model/                 # 数据模型层（用于数据库与数据结构定义）
-├── repo/                  # 数据库交互层（用于数据持久化）
-├── router/                # 路由注册
-│   └── router.go          # 配置 Gin 路由与 gRPC 客户端
-├── service/               # 核心业务逻辑（服务层）
-│   └── user_service.go    # 用户相关的业务逻辑
-├── tmp/                   # 临时目录（可以放缓存或日志）
-├── utils/                 # 工具类（如 gRPC 工厂等）
-│   ├── grpc_factory.go    # gRPC 客户端工厂
-│   └── index.go           # 通用工具函数
-├── .gitignore             # Git 忽略配置
-├── build_proto.sh         # 编译 proto 文件的脚本
-├── go.mod                 # Go 模块依赖
-└── go.sum                 # Go 依赖的校验文件
+├── common/                # 公共工具与通用逻辑（如错误、日志）
+│   └── logger/
+├── config/                # 配置文件加载（支持多环境）
+├── di/                    # 🚀依赖注入容器封装（基于 dig）
+│   └── container.go
+├── dto/                   # DTO 数据结构
+├── grpc/
+│   ├── client/            # gRPC 客户端封装
+│   ├── container/         # gRPC 客户端依赖注入
+│   ├── handler/           # gRPC 逻辑实现
+│   ├── proto/             # proto 文件与生成代码
+│   ├── register.go        # gRPC 注册器
+│   └── server.go          # gRPC 启动器
+├── handler/               # Gin 控制器（HTTP handler）
+├── middleware/            # 中间件（日志、认证等）
+├── model/                 # 数据模型定义（GORM）
+├── repo/                  # 持久层（封装数据库访问）
+├── router/                # Gin 路由注册
+├── service/               # 业务逻辑层
+├── utils/                 # 工具方法
+│   └── grpc_factory.go
 ```
+---
 
+## 💡 技术栈与特点
 
-⸻
+| 组件       | 说明                                           |
+|------------|------------------------------------------------|
+| Gin        | 快速的 HTTP 路由框架                            |
+| gRPC       | 高性能服务间通信协议，支持 proto 代码生成       |
+| Consul     | 服务注册与发现，gRPC 服务自动注册               |
+| GORM       | Golang ORM 框架，用于操作 MySQL 数据库          |
+| dig        | 🧩 Uber 出品的依赖注入容器，减少硬编码依赖       |
+| zap        | 高性能结构化日志框架                            |
 
-## 🧪 启动方式
+---
 
-1. 安装依赖
+## 🚀 启动方式
 
-首先，安装所有依赖：
-```
+1. 安装依赖：
+
+```bash
 go mod tidy
-```
-2. 启动服务
 
-启动服务：
-```
+	2.	启动服务：
+
 go run main.go
-```
-默认监听端口：
-	•	HTTP 接口：http://localhost:8888
-	•	gRPC 服务：localhost:50051
+
+	•	默认监听端口：
+	•	HTTP: http://localhost:8888
+	•	gRPC: localhost:50051
 
 ⸻
 
-## 🧬 代码解析
+🧬 核心架构说明
 
-main.go 入口文件
-- 在 main.go 中，程序主要做了以下几项操作：
-	- 环境变量与日志配置：
-	  - 通过 os.Getenv("ENV") 获取当前环境（开发环境或生产环境），并相应配置 gin 的日志模式（开发模式或生产模式）。
-		- 使用 zap 日志库，根据不同环境初始化不同的日志配置。
-	- 中间件配置：
-	  - 配置了一些常用的中间件，如：
-	  - Trace：追溯请求 ID，用于日志追踪。
-	  - AuthWhiteList：认证白名单，用于跳过特定的认证检查。
-	  - Ginzap：在开发环境中输出日志到终端。
-	  - RecoveryWithZap：自动恢复 panic 错误，并输出日志。
-	  - Logger：自定义的日志中间件。
-	- 配置初始化：
-	  - 使用 config.InitConfig() 加载配置文件。如果加载失败，将会记录错误信息。
-	- gRPC 服务启动：
-	  - 通过 container.InitContainer() 初始化 gRPC 服务的依赖注入容器。
-	  - 启动 gRPC 服务（server.IntServer()）。
-	- gRPC 客户端初始化与路由注册：
-	  - 使用 container.InitClient() 初始化 gRPC 客户端。
-	  - 使用 router.RegisterRoutes() 注册 HTTP 路由。
-	- 服务器运行：
-	  - 最后，调用 r.Run(":8888") 启动 Gin HTTP 服务器。
+🔗 依赖注入（dig 容器）
+
+容器初始化在：
+
+internal/di/container.go
+
+注入了以下依赖：
+	•	配置加载（config.ProvideConfig）
+	•	数据库连接（repo.ProvideDB）
+	•	业务服务（如 service.ProvideUserService）
+	•	控制器（handler.ProviderUserHandler）
+	•	gRPC 客户端（grpc/container.NewProvideClients）
+
+使用方式：
+
+container := di.NewContainer()
+
+// 调用 handler 中的依赖
+container.Invoke(func(h *handler.UserHandler) {
+    // 使用 handler
+})
+
+☁️ 配置系统
+	•	配置文件位于 /config/config.{env}.yaml
+	•	支持多环境切换：通过 APP_ENV=dev、APP_ENV=prod 控制
+	•	使用 viper 自动读取并注入依赖
+
+🧰 数据访问层
+	•	封装于 repo.Repo
+	•	注入为 *gorm.DB 或自定义结构体
+	•	自动迁移模型结构（如 User）
+
+⚙️ gRPC 模块
+	•	grpc/client/: 客户端封装
+	•	grpc/handler/: 具体服务逻辑实现
+	•	grpc/proto/: proto 文件与自动生成代码
+	•	grpc/server.go: gRPC 启动入口
+
+启动后将自动注册至 Consul，并支持 grpcurl 调用。
 
 ⸻
 
-## 🛰 gRPC 模块说明
-```
-模块名	说明
-client/	封装 gRPC 客户端调用逻辑，支持复用连接、负载均衡等
-container/	管理 handler 所需依赖，便于注入到 handler
-handler/	实现 .proto 定义的服务接口，用于处理请求（如 SayHello）
-proto/	包含 .proto 源文件及通过 protoc 生成的代码
-register.go	把多个 handler 注册到 gRPC 服务中，保持 server.go 简洁
-server.go	启动 gRPC 服务监听端口，注册健康检查、服务注册到 Consul 等
-```
+🧪 API 示例
 
+REST 接口（HTTP）
 
-⸻
+GET 示例：
 
-## 📦 RESTful API 示例（Gin）
+curl http://localhost:8888/user/test
 
-GET 请求
-```
-http://localhost:8888/user/test
-```
-返回示例：
-```
+返回：
+
 {
-  "greeting": "你好, {user_data}!"
+  "greeting": "你好, 用户!"
 }
-```
 
+gRPC 接口
 
-⸻
+使用 grpcurl 测试：
 
-## 🧬 gRPC 接口测试
-
-使用 grpcurl 命令行工具进行测试：
-```
 grpcurl -plaintext localhost:50051 app.HelloService.SayHello
-```
-
-
-⸻
-
-## 🔧 环境变量支持
-
-环境变量	描述	示例值
-ENV	切换运行模式	development / production
 
 
 
 ⸻
 
-## 📌 后续规划（TODO）
+⚙️ 环境变量支持
 
-	-	添加用户鉴权中间件（JWT）
-	- kafka异步订阅消息
+变量名	描述	示例值
+APP_ENV	运行环境	dev / prod
+SQL_URL	数据库连接字符串	user:pwd@tcp(…)
+
+
+
+⸻
+
+📌 后续规划（TODO）
+	•	⏳ 用户鉴权中间件（JWT）
+	•	⏳ Kafka 消息队列集成
 
 ⸻
 
 📄 License
 
-MIT License.
+MIT License
 
 ⸻
-
-其他说明
-
-该框架结构清晰，易于扩展。通过 Gin 提供的路由与中间件支持 HTTP 服务，同时 gRPC 提供高效的微服务间通信。通过 Consul 提供服务发现与健康检查，提升系统的可维护性与可扩展性。依赖注入容器进一步解耦了各个模块，提高了代码的模块化和可测试性。

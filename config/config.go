@@ -6,9 +6,8 @@ import (
 	"os"
 
 	"github.com/spf13/viper"
+	"go.uber.org/dig"
 )
-
-var Cfg *dto.Config
 
 func InitConfig() (*dto.Config, error) {
 	envName := os.Getenv("APP_ENV")
@@ -27,9 +26,12 @@ func InitConfig() (*dto.Config, error) {
 		return &c, fmt.Errorf("解析配置失败: %w", err)
 	}
 
-	Cfg = &c
 	viper.WatchConfig()
 
-	return Cfg, nil
+	return &c, nil
 
+}
+
+func ProvideConfig(contanier *dig.Container) {
+	contanier.Provide(InitConfig)
 }

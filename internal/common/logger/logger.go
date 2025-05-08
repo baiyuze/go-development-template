@@ -24,36 +24,59 @@ func GetLogger(c *gin.Context) *zap.Logger {
 	return zap.NewNop()
 }
 
-// InitLogger 初始化生产环境日志，支持日志文件输出，并实现文件轮转
+// InitLogger 初始化日志，控制台输出彩色日志，文件输出 JSON 并支持文件轮转
 func InitLogger() (*zap.Logger, error) {
-	var logFile = GetLogFilePath()
-	// 使用 lumberjack 实现日志文件轮转
-	writer := &lumberjack.Logger{
-		Filename:   logFile, // 日志文件路径
-		MaxSize:    10,      // MB, 每个日志文件最大大小
-		MaxBackups: 3,       // 最多保留3个备份文件
-		MaxAge:     28,      // 最长保存28天的日志
-		Compress:   false,   // 是否压缩
-	}
-	localTime := time.Local
-	// JSON 编码器
-	encoderConfig := zap.NewProductionEncoderConfig()
-	encoderConfig.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-		// 使用本地时区（t.In(time.Local)）来格式化时间
-		enc.AppendString(t.In(localTime).Format(time.RFC3339)) // 使用 RFC3339 格式并带本地时区
-	}
-	jsonEncoder := zapcore.NewJSONEncoder(encoderConfig)
-	// 创建文件同步器
-	fileSyncer := zapcore.AddSync(writer)
+	logFile := GetLogFilePath()
 
-	// 设置日志级别为 InfoLevel 或更高（生产环境通常不记录 Debug）
+	// 文件写入器（带轮转）
+	fileWriter := &lumberjack.Logger{
+		Filename:   logFile,
+		MaxSize:    10, // MB
+		MaxBackups: 3,
+		MaxAge:     28, // 天
+		Compress:   false,
+	}
+	fileSyncer := zapcore.AddSync(fileWriter)
+	consoleSyncer := zapcore.AddSync(os.Stdout)
+
+	// 设置日志级别
 	level := zapcore.InfoLevel
 
-	// 创建文件 core，文件使用 JSON 编码器
-	fileCore := zapcore.NewCore(jsonEncoder, fileSyncer, level)
+	// 公共配置
+	encoderConfig := zapcore.EncoderConfig{
+		TimeKey:       "time",
+		LevelKey:      "level",
+		NameKey:       "logger",
+		CallerKey:     "caller",
+		MessageKey:    "msg",
+		StacktraceKey: "stacktrace",
+		LineEnding:    zapcore.DefaultLineEnding,
+		EncodeTime: func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+			enc.AppendString(t.In(time.Local).Format(time.RFC3339))
+		},
+		EncodeDuration: zapcore.StringDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
+	}
 
-	// 创建 logger
-	logger := zap.New(fileCore)
+	// JSON 编码器（用于文件）
+	jsonEncoder := zapcore.NewJSONEncoder(encoderConfig)
+
+	// Console 编码器（带颜色，用于终端）
+	encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	consoleEncoder := zapcore.NewConsoleEncoder(encoderConfig)
+
+	// 构建两个 core：一个输出到文件，一个输出到控制台
+	fileCore := zapcore.NewCore(jsonEncoder, fileSyncer, level)
+	consoleCore := zapcore.NewCore(consoleEncoder, consoleSyncer, level)
+
+	// 合并 core
+	core := zapcore.NewTee(
+		fileCore,
+		consoleCore,
+	)
+
+	// 构建 logger，带 caller 信息
+	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 
 	return logger, nil
 }

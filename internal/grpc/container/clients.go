@@ -1,21 +1,17 @@
-package AppContext
+package container
 
 import (
-	"app/config"
-	"app/internal/dto"
 	pb "app/internal/grpc/proto"
 	"app/utils"
 	"fmt"
 	"log"
 
 	"github.com/hashicorp/consul/api"
-	"go.uber.org/zap"
+	"go.uber.org/dig"
 	"google.golang.org/grpc"
 )
 
-type AppContext struct {
-	Config     *dto.Config
-	Logger     *zap.Logger
+type Clients struct {
 	UserClient pb.HelloServiceClient
 	UserConn   *grpc.ClientConn
 }
@@ -23,8 +19,6 @@ type AppContext struct {
 type ServiceDiscovery struct {
 	client *api.Client
 }
-
-var Context *AppContext
 
 // 初始化发现器
 func NewServiceDiscovery() *ServiceDiscovery {
@@ -65,15 +59,14 @@ func newClient[T any](serverName string, constructor func(grpc.ClientConnInterfa
 	return client, conn
 }
 
-func InitClient(logger *zap.Logger) *AppContext {
-
+func InitClients() *Clients {
 	client, conn := newClient("user-service", pb.NewHelloServiceClient)
-	fmt.Println(client, conn, "-------InitClient---->")
-	Context = &AppContext{
-		Config:     config.Cfg,
+	return &Clients{
 		UserClient: client,
 		UserConn:   conn,
-		Logger:     logger,
 	}
-	return Context
+}
+
+func NewProvideClients(container *dig.Container) {
+	container.Provide(InitClients)
 }

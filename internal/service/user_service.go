@@ -3,6 +3,7 @@ package service
 import (
 	"app/internal/model"
 
+	"go.uber.org/dig"
 	"gorm.io/gorm"
 )
 
@@ -16,6 +17,10 @@ type userService struct {
 
 func NewUserService(db *gorm.DB) UserService {
 	return &userService{db: db}
+}
+
+func ProvideUserService(container *dig.Container) {
+	container.Provide(NewUserService)
 }
 
 func (s *userService) GetUserOne() (*model.User, error) {

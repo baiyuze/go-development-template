@@ -5,13 +5,16 @@ import (
 	"log"
 	"os"
 
+	"go.uber.org/dig"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB // 全局变量
+type Repo struct {
+	DB *gorm.DB
+}
 
-func InitDB() *gorm.DB {
+func InitDB() *Repo {
 
 	// dsn := "guang:mysqlpassword666@tcp(data.sanyang.life::3307)/front_resource_test?charset=utf8mb4&parseTime=True&loc=Local"
 	SQL_URL := os.Getenv("SQL_URL")
@@ -34,6 +37,13 @@ func InitDB() *gorm.DB {
 	// 自动迁移模型（可选）
 	db.AutoMigrate(&model.User{})
 
-	DB = db
-	return DB
+	// DB = db
+	return &Repo{DB: db}
+}
+
+func ProvideDB(container *dig.Container) {
+	container.Provide(InitDB) // 提供 *repo.Repo
+	container.Provide(func(r *Repo) *gorm.DB {
+		return r.DB
+	})
 }

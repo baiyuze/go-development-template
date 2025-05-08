@@ -1,20 +1,19 @@
 package client
 
 import (
-	AppContext "app/internal/app_ontext"
+	// AppContext "app/internal/app_ontext"
+	"app/internal/grpc/container"
 	pb "app/internal/grpc/proto"
 	"context"
-	"fmt"
 	"log"
 	"time"
 )
 
-func SayHello(token string) (*pb.HelloResponse, error) {
+func SayHello(clients *container.Clients) (*pb.HelloResponse, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	req := &pb.HelloRequest{Name: "吃啥"}
-	fmt.Println(AppContext.Context, "--------------------->")
-	resp, err := AppContext.Context.UserClient.SayHello(ctx, req)
+	resp, err := clients.UserClient.SayHello(ctx, req)
 	if err != nil {
 		log.Fatalf("调用失败: %v", err)
 	}

@@ -1,9 +1,7 @@
 package main
 
 import (
-	"app/config"
-	AppContext "app/internal/app_ontext"
-	"app/internal/container"
+	"app/internal/di"
 	server "app/internal/grpc"
 	"app/internal/middleware"
 	"app/internal/router"
@@ -29,7 +27,7 @@ func main() {
 		logger, _ = zapLog.InitLogger()
 	} else {
 		gin.SetMode(gin.DebugMode) // 开发环境
-		logger, _ = zap.NewDevelopment()
+		logger, _ = zapLog.InitLogger()
 	}
 	defer logger.Sync()
 	if !isProduction {
@@ -48,24 +46,24 @@ func main() {
 
 	// 日志
 	r.Use(middleLog.Logger)
-	envConfig, envErr := config.InitConfig()
-	if envErr != nil {
-		logger.Error("配置错误", zap.String("traceId", envErr.Error()))
-	}
+	// envConfig, envErr := config.InitConfig()
+	// if envErr != nil {
+	// 	logger.Error("配置错误", zap.String("traceId", envErr.Error()))
+	// }
 
-	fmt.Println(envConfig.Service, config.Cfg, "envConfig")
-	Deps := container.InitContainer(logger)
+	// fmt.Println(envConfig.Service, config.Cfg, "envConfig")
+	// Deps := container.InitContainer(logger)
+
+	container := di.NewContainer()
+
 	go func() {
-		go server.IntServer(Deps)
+		go server.IntServer(container)
 	}()
 
-	// 初始化GRPC客户端
-	// clientDeps := container.InitClient(logger)
-
-	AppContext.InitClient(logger)
+	// AppContext.InitClient(logger)
 
 	// 初始化grpc服务
-	router.RegisterRoutes(r, Deps)
+	router.RegisterRoutes(r, container)
 
 	// 运行服务器
 	err := r.Run(":8888")
