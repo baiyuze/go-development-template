@@ -46,90 +46,93 @@ internal/
 
 ## 🚀 启动方式
 
-1. 安装依赖：
+#### 1. 安装依赖：
 
-```bash
-go mod tidy
+`go mod tidy`
 
-	2.	启动服务：
+#### 2.	启动服务：
 
-go run main.go
+`go run main.go`
 
-	•	默认监听端口：
-	•	HTTP: http://localhost:8888
-	•	gRPC: localhost:50051
+- 默认监听端口：
+- HTTP: http://localhost:8888
+- gRPC: localhost:50051
 
 ⸻
 
-🧬 核心架构说明
+#### 🧬 核心架构说明
 
 🔗 依赖注入（dig 容器）
 
-容器初始化在：
+#### 容器初始化在：
 
-internal/di/container.go
+`internal/di/container.go`
 
-注入了以下依赖：
-	•	配置加载（config.ProvideConfig）
-	•	数据库连接（repo.ProvideDB）
-	•	业务服务（如 service.ProvideUserService）
-	•	控制器（handler.ProviderUserHandler）
-	•	gRPC 客户端（grpc/container.NewProvideClients）
+#### 注入了以下依赖：
+-	配置加载（config.ProvideConfig）
+-	数据库连接（repo.ProvideDB）
+-	业务服务（如 service.ProvideUserService）
+-	控制器（handler.ProviderUserHandler）
+-	gRPC 客户端（grpc/container.NewProvideClients）
 
-使用方式：
+#### 使用方式：
 
+```go
 container := di.NewContainer()
 
 // 调用 handler 中的依赖
 container.Invoke(func(h *handler.UserHandler) {
     // 使用 handler
 })
+```
 
-☁️ 配置系统
-	•	配置文件位于 /config/config.{env}.yaml
-	•	支持多环境切换：通过 APP_ENV=dev、APP_ENV=prod 控制
-	•	使用 viper 自动读取并注入依赖
+#### ☁️ 配置系统
+-	配置文件位于 /config/config.{env}.yaml
+-	支持多环境切换：通过 APP_ENV=dev、APP_ENV=prod 控制
+-	使用 viper 自动读取并注入依赖
 
-🧰 数据访问层
-	•	封装于 repo.Repo
-	•	注入为 *gorm.DB 或自定义结构体
-	•	自动迁移模型结构（如 User）
+#### 🧰 数据访问层
+-	封装于 repo.Repo
+-	注入为 *gorm.DB 或自定义结构体
+-	自动迁移模型结构（如 User）
 
-⚙️ gRPC 模块
-	•	grpc/client/: 客户端封装
-	•	grpc/handler/: 具体服务逻辑实现
-	•	grpc/proto/: proto 文件与自动生成代码
-	•	grpc/server.go: gRPC 启动入口
+#### ⚙️ gRPC 模块
+-	grpc/client/: 客户端封装
+-	grpc/handler/: 具体服务逻辑实现
+-	grpc/proto/: proto 文件与自动生成代码
+-	grpc/server.go: gRPC 启动入口
 
-启动后将自动注册至 Consul，并支持 grpcurl 调用。
+#### 启动后将自动注册至 Consul，并支持 grpcurl 调用。
 
 ⸻
 
-🧪 API 示例
+#### 🧪 API 示例
 
 REST 接口（HTTP）
 
 GET 示例：
 
+```bash
 curl http://localhost:8888/user/test
+```
 
 返回：
-
+```go
 {
   "greeting": "你好, 用户!"
 }
-
-gRPC 接口
+```
+#### gRPC 接口
 
 使用 grpcurl 测试：
-
+```go
 grpcurl -plaintext localhost:50051 app.HelloService.SayHello
-
+```
 
 
 ⸻
 
-⚙️ 环境变量支持
+#### ⚙️ 环境变量支持
 
 变量名	描述	示例值
 APP_ENV	运行环境	dev / prod
@@ -139,7 +142,7 @@ SQL_URL	数据库连接字符串	user:pwd@tcp(…)
 
 ⸻
 
-📌 后续规划（TODO）
+#### 📌 后续规划（TODO）
 	•	⏳ 用户鉴权中间件（JWT）
 	•	⏳ Kafka 消息队列集成
 
