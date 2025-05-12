@@ -5,6 +5,7 @@ import (
 
 	errs "app/internal/common/error"
 	"app/internal/common/logger"
+	"app/internal/dto"
 	"app/internal/grpc/client"
 	"app/internal/grpc/container"
 
@@ -30,6 +31,20 @@ func NewUserHandler(service service.UserService, clients *container.Clients) *Us
 
 func ProviderUserHandler(container *dig.Container) {
 	container.Provide(NewUserHandler)
+}
+
+func (h *UserHandler) Login(c *gin.Context) {
+	var body dto.LoginBody
+	err := c.ShouldBindJSON(&body)
+	if err != nil {
+		errs.MustNoErr(err, "请检查账号密码")
+	} else {
+
+		// user := h.service.GetUserInfo(body.Account)
+		h.service.Login(body)
+		// fmt.Println(hashPsd, "===<")
+		// c.JSON(http.StatusOK, hashPsd)
+	}
 }
 
 // HomeHandler 处理首页请求

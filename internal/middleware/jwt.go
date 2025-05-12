@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -10,7 +9,6 @@ import (
 func Jwt(c *gin.Context) {
 	//先判断是否在白名单内
 	whiteList, ok := c.Get("whiteList")
-	fmt.Println(c.Request.URL.Path, ok, whiteList, "--->")
 	var isHasPath bool
 	if ok {
 		for _, white := range whiteList.([]string) {
