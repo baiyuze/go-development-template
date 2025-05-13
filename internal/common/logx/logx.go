@@ -1,4 +1,4 @@
-package logger
+package logx
 
 import (
 	"fmt"
@@ -7,10 +7,15 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/dig"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
+
+type LoggerWithContext struct {
+	logger *zap.Logger
+}
 
 // GetLogger 获取logger
 func GetLogger(c *gin.Context) *zap.Logger {
@@ -22,6 +27,30 @@ func GetLogger(c *gin.Context) *zap.Logger {
 		return logger
 	}
 	return zap.NewNop()
+}
+
+// 实例化logger
+func NewLogger(logger *zap.Logger) *LoggerWithContext {
+	return &LoggerWithContext{
+		logger: logger,
+	}
+}
+
+// 从context中获取logger
+func (p *LoggerWithContext) WithContext(c *gin.Context) *zap.Logger {
+	l, exists := c.Get("logger")
+	zapLog := zap.NewNop()
+	if !exists {
+		return zapLog
+	}
+	if logger, ok := l.(*zap.Logger); ok {
+		return logger
+	}
+	return zapLog
+}
+
+func NewProvideLogger(container *dig.Container) {
+	container.Provide(NewLogger)
 }
 
 // InitLogger 初始化日志，控制台输出彩色日志，文件输出 JSON 并支持文件轮转

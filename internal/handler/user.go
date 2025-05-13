@@ -4,7 +4,7 @@ import (
 	// AppContext "app/internal/app_ontext"
 
 	errs "app/internal/common/error"
-	"app/internal/common/logger"
+	"app/internal/common/logx"
 	"app/internal/dto"
 	"app/internal/grpc/client"
 	"app/internal/grpc/container"
@@ -20,12 +20,18 @@ import (
 type UserHandler struct {
 	service service.UserService
 	clients *container.Clients
+	logx    *logx.LoggerWithContext
 }
 
-func NewUserHandler(service service.UserService, clients *container.Clients) *UserHandler {
+func NewUserHandler(
+	service service.UserService,
+	clients *container.Clients,
+	logx *logx.LoggerWithContext,
+) *UserHandler {
 	return &UserHandler{
 		service: service,
 		clients: clients,
+		logx:    logx,
 	}
 }
 
@@ -34,24 +40,34 @@ func ProviderUserHandler(container *dig.Container) {
 }
 
 func (h *UserHandler) Login(c *gin.Context) {
+	// logger := h.logx.WithContext(c)
+
 	var body dto.LoginBody
 	err := c.ShouldBindJSON(&body)
 	if err != nil {
 		errs.MustNoErr(err, "请检查账号密码")
 	} else {
 
-		// user := h.service.GetUserInfo(body.Account)
-		h.service.Login(body)
-		// fmt.Println(hashPsd, "===<")
-		// c.JSON(http.StatusOK, hashPsd)
+		sign, err := h.service.Login(c, body)
+		if err != nil {
+			errs.MustReturnErr(c, err.Error())
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"code": 200,
+			"data": gin.H{
+				"token": sign,
+			},
+			"msg": nil,
+		})
 	}
 }
 
 // HomeHandler 处理首页请求
 func (h *UserHandler) HomeHandler(c *gin.Context) {
-	logger := logger.GetLogger(c)
+	// logger := h.logx.WithContext(c)
 
-	logger.Info("测试")
 	user, err := h.service.GetUserOne()
 	if err != nil {
 		errs.MustNoErr(err, "错误了啊")

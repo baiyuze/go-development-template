@@ -23,7 +23,11 @@ func (l *LoggerMiddle) Logger(c *gin.Context) {
 		l.logger.Error("TraceId不存在")
 	} else {
 		query := c.Request.URL.RawQuery
-		loggerWithTrace := l.logger.With(zap.String("traceId", traceId.(string)), zap.String("method", c.Request.Method), zap.String("path", c.Request.URL.Path), zap.String("query", query))
+		loggerWithTrace := l.logger.With(
+			zap.String("traceId", traceId.(string)),
+			zap.String("method", c.Request.Method),
+			zap.String("path", c.Request.URL.Path),
+			zap.String("query", query))
 		c.Set("logger", loggerWithTrace)
 		loggerWithTrace.Info(fmt.Sprint(c.Request.URL.Path, " 🚀"),
 			zap.String("ip", c.ClientIP()),

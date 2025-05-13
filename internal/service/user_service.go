@@ -3,28 +3,31 @@ package service
 import (
 	errs "app/internal/common/error"
 	"app/internal/common/jwt"
+	"app/internal/common/logx"
 	"app/internal/dto"
 	"app/internal/model"
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
+	"errors"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"go.uber.org/dig"
 	"gorm.io/gorm"
 )
 
 type UserService interface {
 	GetUserOne() (*model.User, error)
-	Login(body dto.LoginBody) (string, error)
+	Login(c *gin.Context, body dto.LoginBody) (string, error)
 }
 
 type userService struct {
-	db *gorm.DB
+	db   *gorm.DB
+	logx *logx.LoggerWithContext
 }
 
-func NewUserService(db *gorm.DB) UserService {
-	return &userService{db: db}
+func NewUserService(db *gorm.DB, logx *logx.LoggerWithContext) UserService {
+	return &userService{db: db, logx: logx}
 }
 
 func ProvideUserService(container *dig.Container) {
@@ -40,7 +43,8 @@ func (s *userService) GetUserOne() (*model.User, error) {
 }
 
 // 登录进行校验返回token
-func (s *userService) Login(body dto.LoginBody) (string, error) {
+func (s *userService) Login(c *gin.Context, body dto.LoginBody) (string, error) {
+	// logger := s.logx.WithContext(c)
 	var user model.User
 
 	result := s.db.Where("account = ?", body.Account).First(&user)
@@ -56,8 +60,8 @@ func (s *userService) Login(body dto.LoginBody) (string, error) {
 			errs.MustNoErr(err, "token创建失败")
 			return "", err
 		}
-		fmt.Println(sign, err, "vuserInfouserInfouserInfouserInfo_----->")
+		return sign, nil
 	}
-	return "", nil
+	return "", errors.New("密码错误,请检查账号密码")
 	// return
 }

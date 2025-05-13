@@ -7,11 +7,9 @@ import (
 	"app/internal/router"
 	"fmt"
 	"os"
-	"time"
 
-	zapLog "app/internal/common/logger"
+	"app/internal/common/logx"
 
-	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -24,16 +22,12 @@ func main() {
 	var logger *zap.Logger
 	if isProduction {
 		gin.SetMode(gin.ReleaseMode) // 生产环境
-		logger, _ = zapLog.InitLogger()
+		logger, _ = logx.InitLogger()
 	} else {
 		gin.SetMode(gin.DebugMode) // 开发环境
-		logger, _ = zapLog.InitLogger()
+		logger, _ = logx.InitLogger()
 	}
 	defer logger.Sync()
-	if !isProduction {
-		// 输出日志到终端显示
-		r.Use(ginzap.Ginzap(logger, time.RFC3339, true))
-	}
 	// recover恢复
 	r.Use(middleware.RecoveryWithZap(logger))
 	middleLog := middleware.NewLogger(logger)
@@ -54,7 +48,7 @@ func main() {
 	// fmt.Println(envConfig.Service, config.Cfg, "envConfig")
 	// Deps := container.InitContainer(logger)
 
-	container := di.NewContainer()
+	container := di.NewContainer(logger)
 
 	go func() {
 		go server.IntServer(container)

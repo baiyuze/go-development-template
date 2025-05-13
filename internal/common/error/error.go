@@ -4,9 +4,9 @@ package errs
 import "errors"
 
 type PanicError struct {
-	Code    int
-	Message string
-	Err     error
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Err     error  `json:"err"` // 不暴露内部 error，可选
 }
 
 func (e *PanicError) Error() string {
