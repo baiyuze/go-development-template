@@ -28,4 +28,4 @@ components.d.ts
 *.sln
 *.sw?
 tmp/*
-
+bin/

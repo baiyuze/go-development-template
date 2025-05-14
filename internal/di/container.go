@@ -2,7 +2,7 @@ package di
 
 import (
 	"app/config"
-	"app/internal/common/logx"
+	"app/internal/common/log"
 	grpcContainer "app/internal/grpc/container"
 	"app/internal/handler"
 	"app/internal/repo"
@@ -21,7 +21,7 @@ func NewContainer(logger *zap.Logger) *dig.Container {
 		return logger
 	})
 	// 公共日志管理器
-	logx.NewProvideLogger(container)
+	log.NewProvideLogger(container)
 	// 获取客户端grpc
 	grpcContainer.NewProvideClients(container)
 	// 配置

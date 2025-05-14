@@ -4,7 +4,7 @@ import (
 	// AppContext "app/internal/app_ontext"
 
 	errs "app/internal/common/error"
-	"app/internal/common/logx"
+	log "app/internal/common/log"
 	"app/internal/dto"
 	"app/internal/grpc/client"
 	"app/internal/grpc/container"
@@ -20,18 +20,18 @@ import (
 type UserHandler struct {
 	service service.UserService
 	clients *container.Clients
-	logx    *logx.LoggerWithContext
+	log     *log.LoggerWithContext
 }
 
 func NewUserHandler(
 	service service.UserService,
 	clients *container.Clients,
-	logx *logx.LoggerWithContext,
+	log *log.LoggerWithContext,
 ) *UserHandler {
 	return &UserHandler{
 		service: service,
 		clients: clients,
-		logx:    logx,
+		log:     log,
 	}
 }
 
@@ -48,19 +48,15 @@ func (h *UserHandler) Login(c *gin.Context) {
 		errs.MustNoErr(err, "请检查账号密码")
 	} else {
 
-		sign, err := h.service.Login(c, body)
-		if err != nil {
-			errs.MustReturnErr(c, err.Error())
+		result := h.service.Login(c, body)
+		if result.Error != nil {
+			errs.MustReturnErr(c, result.Error.Error())
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"code": 200,
-			"data": gin.H{
-				"token": sign,
-			},
-			"msg": nil,
-		})
+		c.JSON(http.StatusOK, dto.Ok(gin.H{
+			"token": result.Data,
+		}))
 	}
 }
 

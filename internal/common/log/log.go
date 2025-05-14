@@ -1,4 +1,4 @@
-package logx
+package log
 
 import (
 	"fmt"
@@ -56,6 +56,8 @@ func NewProvideLogger(container *dig.Container) {
 // InitLogger 初始化日志，控制台输出彩色日志，文件输出 JSON 并支持文件轮转
 func InitLogger() (*zap.Logger, error) {
 	logFile := GetLogFilePath()
+	env := os.Getenv("ENV")
+	isProduction := env == "production"
 
 	// 文件写入器（带轮转）
 	fileWriter := &lumberjack.Logger{
@@ -87,22 +89,25 @@ func InitLogger() (*zap.Logger, error) {
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
 
-	// JSON 编码器（用于文件）
-	jsonEncoder := zapcore.NewJSONEncoder(encoderConfig)
-
-	// Console 编码器（带颜色，用于终端）
-	encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	consoleEncoder := zapcore.NewConsoleEncoder(encoderConfig)
-
-	// 构建两个 core：一个输出到文件，一个输出到控制台
-	fileCore := zapcore.NewCore(jsonEncoder, fileSyncer, level)
-	consoleCore := zapcore.NewCore(consoleEncoder, consoleSyncer, level)
-
-	// 合并 core
-	core := zapcore.NewTee(
-		fileCore,
-		consoleCore,
-	)
+	var core zapcore.Core
+	// dev
+	if !isProduction {
+		consoleEncoder := zapcore.NewConsoleEncoder(encoderConfig)
+		consoleCore := zapcore.NewCore(consoleEncoder, consoleSyncer, level)
+		// 合并 core
+		core = zapcore.NewTee(
+			consoleCore,
+		)
+	} else {
+		// JSON 编码器（用于文件）
+		jsonEncoder := zapcore.NewJSONEncoder(encoderConfig)
+		// Console 编码器（带颜色，用于终端）
+		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+		fileCore := zapcore.NewCore(jsonEncoder, fileSyncer, level)
+		core = zapcore.NewTee(
+			fileCore,
+		)
+	}
 
 	// 构建 logger，带 caller 信息
 	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))

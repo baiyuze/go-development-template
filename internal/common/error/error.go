@@ -1,7 +1,9 @@
 package errs
 
 // func
-import "errors"
+import (
+	"errors"
+)
 
 type PanicError struct {
 	Code    int    `json:"code"`
@@ -11,7 +13,7 @@ type PanicError struct {
 
 func (e *PanicError) Error() string {
 	if e.Err != nil {
-		return e.Message + ": " + e.Err.Error()
+		return e.Err.Error()
 	}
 	return e.Message
 }

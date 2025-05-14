@@ -3,7 +3,7 @@ package service
 import (
 	errs "app/internal/common/error"
 	"app/internal/common/jwt"
-	"app/internal/common/logx"
+	"app/internal/common/log"
 	"app/internal/dto"
 	"app/internal/model"
 	"crypto/sha256"
@@ -18,16 +18,16 @@ import (
 
 type UserService interface {
 	GetUserOne() (*model.User, error)
-	Login(c *gin.Context, body dto.LoginBody) (string, error)
+	Login(c *gin.Context, body dto.LoginBody) dto.Result[string]
 }
 
 type userService struct {
-	db   *gorm.DB
-	logx *logx.LoggerWithContext
+	db  *gorm.DB
+	log *log.LoggerWithContext
 }
 
-func NewUserService(db *gorm.DB, logx *logx.LoggerWithContext) UserService {
-	return &userService{db: db, logx: logx}
+func NewUserService(db *gorm.DB, log *log.LoggerWithContext) UserService {
+	return &userService{db: db, log: log}
 }
 
 func ProvideUserService(container *dig.Container) {
@@ -43,13 +43,13 @@ func (s *userService) GetUserOne() (*model.User, error) {
 }
 
 // 登录进行校验返回token
-func (s *userService) Login(c *gin.Context, body dto.LoginBody) (string, error) {
-	// logger := s.logx.WithContext(c)
+func (s *userService) Login(c *gin.Context, body dto.LoginBody) dto.Result[string] {
+	// logger := s.log.WithContext(c)
 	var user model.User
 
 	result := s.db.Where("account = ?", body.Account).First(&user)
 	if result.Error != nil {
-		return "", result.Error
+		return dto.Result[string]{Data: "", Error: errors.New("密码错误,请检查账号密码")}
 	}
 	psd := sha256.Sum256([]byte(body.Password))
 	hashPsd := hex.EncodeToString(psd[:])
@@ -58,10 +58,10 @@ func (s *userService) Login(c *gin.Context, body dto.LoginBody) (string, error) 
 		sign, err := jwt.Auth(user, time.Now().Unix()+1000*60*60*2)
 		if err != nil {
 			errs.MustNoErr(err, "token创建失败")
-			return "", err
+			return dto.Result[string]{Data: "", Error: err}
 		}
-		return sign, nil
+		return dto.Result[string]{Data: sign, Error: nil}
+
 	}
-	return "", errors.New("密码错误,请检查账号密码")
-	// return
+	return dto.Result[string]{Data: "sign", Error: errors.New("密码错误,请检查账号密码")}
 }

@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"os"
 
-	"app/internal/common/logx"
+	"app/internal/common/log"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -22,10 +22,10 @@ func main() {
 	var logger *zap.Logger
 	if isProduction {
 		gin.SetMode(gin.ReleaseMode) // 生产环境
-		logger, _ = logx.InitLogger()
+		logger, _ = log.InitLogger()
 	} else {
 		gin.SetMode(gin.DebugMode) // 开发环境
-		logger, _ = logx.InitLogger()
+		logger, _ = log.InitLogger()
 	}
 	defer logger.Sync()
 	// recover恢复
@@ -40,21 +40,12 @@ func main() {
 
 	// 日志
 	r.Use(middleLog.Logger)
-	// envConfig, envErr := config.InitConfig()
-	// if envErr != nil {
-	// 	logger.Error("配置错误", zap.String("traceId", envErr.Error()))
-	// }
-
-	// fmt.Println(envConfig.Service, config.Cfg, "envConfig")
-	// Deps := container.InitContainer(logger)
 
 	container := di.NewContainer(logger)
 
 	go func() {
 		go server.IntServer(container)
 	}()
-
-	// AppContext.InitClient(logger)
 
 	// 初始化grpc服务
 	router.RegisterRoutes(r, container)
