@@ -16,7 +16,7 @@ type Repo struct {
 
 func InitDB() *Repo {
 
-	// dsn := "guang:mysqlpassword666@tcp(data.sanyang.life::3307)/front_resource_test?charset=utf8mb4&parseTime=True&loc=Local"
+	// dsn := "test:test123@tcp(192.168.1.1::3307)/test?charset=utf8mb4&parseTime=True&loc=Local"
 	SQL_URL := os.Getenv("SQL_URL")
 	dsn := SQL_URL
 	db, err := gorm.Open(mysql.New(mysql.Config{
