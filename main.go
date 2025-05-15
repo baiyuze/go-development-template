@@ -11,7 +11,6 @@ import (
 	"app/internal/common/log"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 func main() {
@@ -19,13 +18,12 @@ func main() {
 	isProduction := env == "production"
 	r := gin.New()
 
-	var logger *zap.Logger
+	logger, _ := log.InitLogger()
+
 	if isProduction {
 		gin.SetMode(gin.ReleaseMode) // 生产环境
-		logger, _ = log.InitLogger()
 	} else {
 		gin.SetMode(gin.DebugMode) // 开发环境
-		logger, _ = log.InitLogger()
 	}
 	defer logger.Sync()
 	// recover恢复
