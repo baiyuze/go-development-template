@@ -32,12 +32,12 @@ func main() {
 
 	// 追溯Id
 	r.Use(middleware.Trace)
+	// 日志
+	r.Use(middleLog.Logger)
+
 	// 认证白名单
 	r.Use(middleware.AuthWhiteList)
 	r.Use(middleware.Jwt)
-
-	// 日志
-	r.Use(middleLog.Logger)
 
 	container := di.NewContainer(logger)
 

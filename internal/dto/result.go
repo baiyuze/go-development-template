@@ -20,7 +20,7 @@ const (
 	CodeServerErr = 500
 )
 
-// 快捷构造函数
+// Ok 快捷构造函数
 func Ok[T any](data T) Response[T] {
 	return Response[T]{
 		Code:    http.StatusOK,

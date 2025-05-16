@@ -18,7 +18,7 @@ import (
 
 type UserService interface {
 	GetUserOne() (*model.User, error)
-	Login(c *gin.Context, body dto.LoginBody) dto.Result[string]
+	Login(c *gin.Context, body dto.LoginBody) dto.Result[dto.LoginResult]
 }
 
 type userService struct {
@@ -43,25 +43,40 @@ func (s *userService) GetUserOne() (*model.User, error) {
 }
 
 // 登录进行校验返回token
-func (s *userService) Login(c *gin.Context, body dto.LoginBody) dto.Result[string] {
+func (s *userService) Login(c *gin.Context, body dto.LoginBody) dto.Result[dto.LoginResult] {
 	// logger := s.log.WithContext(c)
 	var user model.User
 
 	result := s.db.Where("account = ?", body.Account).First(&user)
 	if result.Error != nil {
-		return dto.Result[string]{Data: "", Error: errors.New("密码错误,请检查账号密码")}
+		return dto.Result[dto.LoginResult]{Data: dto.LoginResult{}, Error: errors.New("密码错误,请检查账号密码")}
 	}
 	psd := sha256.Sum256([]byte(body.Password))
 	hashPsd := hex.EncodeToString(psd[:])
 	if user.Account == body.Account && hashPsd == user.Password {
 		// 调用jwt
-		sign, err := jwt.Auth(user, time.Now().Unix()+1000*60*60*2)
+		//两小时过期
+		sign, err := jwt.Auth(user, time.Now().Add(2*time.Hour).Unix())
 		if err != nil {
 			errs.MustNoErr(err, "token创建失败")
-			return dto.Result[string]{Data: "", Error: err}
+			return dto.Result[dto.LoginResult]{Data: dto.LoginResult{}, Error: err}
 		}
-		return dto.Result[string]{Data: sign, Error: nil}
+		//7天过期
+		flushSign, err := jwt.Auth(user, time.Now().Add(24*7*time.Hour).Unix())
+		if err != nil {
+			errs.MustNoErr(err, "token创建失败")
+			return dto.Result[dto.LoginResult]{Data: dto.LoginResult{}, Error: err}
+		}
+		return dto.Result[dto.LoginResult]{Data: dto.LoginResult{
+			Token:      sign,
+			FlushToken: flushSign,
+			UserInfo: &dto.UserInfo{
+				Account: user.Account,
+				Name:    user.Name,
+				Id:      float64(user.ID),
+			},
+		}, Error: nil}
 
 	}
-	return dto.Result[string]{Data: "sign", Error: errors.New("密码错误,请检查账号密码")}
+	return dto.Result[dto.LoginResult]{Data: dto.LoginResult{}, Error: errors.New("密码错误,请检查账号密码")}
 }

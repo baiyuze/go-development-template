@@ -36,7 +36,10 @@ func NewUserHandler(
 }
 
 func ProviderUserHandler(container *dig.Container) {
-	container.Provide(NewUserHandler)
+	err := container.Provide(NewUserHandler)
+	if err != nil {
+		return
+	}
 }
 
 func (h *UserHandler) Login(c *gin.Context) {
@@ -50,7 +53,10 @@ func (h *UserHandler) Login(c *gin.Context) {
 
 		result := h.service.Login(c, body)
 		if result.Error != nil {
-			errs.MustReturnErr(c, result.Error.Error())
+			err := errs.MustReturnErr(c, result.Error.Error())
+			if err != nil {
+				return
+			}
 			return
 		}
 
@@ -58,6 +64,11 @@ func (h *UserHandler) Login(c *gin.Context) {
 			"token": result.Data,
 		}))
 	}
+}
+
+// TestAuth 用来验证是否token
+func (h *UserHandler) TestAuth(c *gin.Context) {
+	c.JSON(http.StatusOK, dto.Ok("成功"))
 }
 
 // HomeHandler 处理首页请求
