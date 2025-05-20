@@ -8,9 +8,9 @@ type LoginBody struct {
 }
 
 type UserInfo struct {
-	Account string
-	Name    string
-	Id      float64
+	Account string  `json:"account"`
+	Name    string  `json:"name"`
+	Id      float64 `json:"id"`
 }
 
 type CustomClaims struct {
@@ -21,7 +21,7 @@ type CustomClaims struct {
 }
 
 type LoginResult struct {
-	Token      string    `json:"token,omitempty"`
-	FlushToken string    `json:"flushToken,omitempty"`
-	UserInfo   *UserInfo `json:"userInfo,omitempty"`
+	Token        string    `json:"token,omitempty"`
+	RefreshToken string    `json:"refreshToken,omitempty"`
+	UserInfo     *UserInfo `json:"userInfo,omitempty"`
 }

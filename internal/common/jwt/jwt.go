@@ -4,6 +4,9 @@ import (
 	"app/internal/dto"
 	"app/internal/model"
 	"errors"
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -53,7 +56,31 @@ func Analysis(tokenString string) (dto.UserInfo, error) {
 	}
 }
 
-// 校验token是否有效
-func VerifyValidByToken() {
+// VerifyValidByToken 校验token是否有效
+func VerifyValidByToken(c *gin.Context, logger *zap.Logger, tokenKey string) error {
 
+	tokenString := c.Request.Header.Get(tokenKey)
+	if tokenString != "" {
+		//// 先验证token有效性，再判断是否过期，如果过期，需要返回过期
+		userInfo, err := Analysis(tokenString)
+
+		if err != nil {
+			logger.Error(err.Error())
+			c.JSON(http.StatusUnauthorized, dto.Fail(http.StatusUnauthorized, err.Error()))
+			c.Abort()
+			return err
+		} else {
+			c.Set("userInfo", userInfo)
+			c.Next()
+			return nil
+		}
+
+	} else {
+		err := errors.New("token不存在")
+		errMsg := err.Error()
+		logger.Error(errMsg)
+		c.JSON(http.StatusUnauthorized, dto.Fail(http.StatusUnauthorized, errMsg))
+		c.Abort()
+		return err
+	}
 }

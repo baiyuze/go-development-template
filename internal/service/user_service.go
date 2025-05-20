@@ -26,7 +26,10 @@ type userService struct {
 	log *log.LoggerWithContext
 }
 
-func NewUserService(db *gorm.DB, log *log.LoggerWithContext) UserService {
+func NewUserService(
+	db *gorm.DB,
+	log *log.LoggerWithContext) UserService {
+
 	return &userService{db: db, log: log}
 }
 
@@ -42,7 +45,7 @@ func (s *userService) GetUserOne() (*model.User, error) {
 	return &user, nil
 }
 
-// 登录进行校验返回token
+// Login 登录进行校验返回token
 func (s *userService) Login(c *gin.Context, body dto.LoginBody) dto.Result[dto.LoginResult] {
 	// logger := s.log.WithContext(c)
 	var user model.User
@@ -62,14 +65,16 @@ func (s *userService) Login(c *gin.Context, body dto.LoginBody) dto.Result[dto.L
 			return dto.Result[dto.LoginResult]{Data: dto.LoginResult{}, Error: err}
 		}
 		//7天过期
-		flushSign, err := jwt.Auth(user, time.Now().Add(24*7*time.Hour).Unix())
+		refreshToken, err := jwt.Auth(user,
+			time.Now().Add(24*7*time.Hour).Unix())
 		if err != nil {
 			errs.MustNoErr(err, "token创建失败")
-			return dto.Result[dto.LoginResult]{Data: dto.LoginResult{}, Error: err}
+			return dto.Result[dto.LoginResult]{Data: dto.LoginResult{},
+				Error: err}
 		}
 		return dto.Result[dto.LoginResult]{Data: dto.LoginResult{
-			Token:      sign,
-			FlushToken: flushSign,
+			Token:        sign,
+			RefreshToken: refreshToken,
 			UserInfo: &dto.UserInfo{
 				Account: user.Account,
 				Name:    user.Name,

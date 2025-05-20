@@ -18,6 +18,8 @@ func AuthWhiteList(c *gin.Context) {
 	whiteList := []string{
 		"public",
 		"user/login",
+		"user/register",
+		//"user/logout",
 	}
 	c.Set("whiteList", whiteList)
 	c.Next()

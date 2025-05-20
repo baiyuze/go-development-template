@@ -2,15 +2,14 @@ package middleware
 
 import (
 	"app/internal/common/jwt"
-	"app/internal/dto"
 	"fmt"
 	"go.uber.org/zap"
-	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
+// Jwt 过滤白名单和验证token是否有效
 func Jwt(c *gin.Context) {
 	//先判断是否在白名单内
 	log, ok := c.Get("logger")
@@ -31,22 +30,19 @@ func Jwt(c *gin.Context) {
 			}
 		}
 	}
+	//白名单过滤
 	if isHasPath {
 		c.Next()
 	} else {
-		tokenString := c.Request.Header.Get("Authorization")
 
-		//// 先验证token有效性，再判断是否过期，如果过期，需要返回过期
-		userInfo, err := jwt.Analysis(tokenString)
-
-		if err != nil {
-			logger.Error(err.Error())
-			c.JSON(http.StatusUnauthorized, dto.Fail(http.StatusUnauthorized, err.Error()))
-			c.Abort()
-		} else {
-			c.Set("userInfo", userInfo)
-			c.Next()
+		if err := jwt.VerifyValidByToken(c, logger, "Authorization"); err != nil {
+			logger.Error("Authorization verify token failed", zap.Error(err))
+			return
 		}
-
+		//如果token过期了，用refresh刷新token，refreshToken过期了，如果token没过期，刷新refreshToken
+		if err := jwt.VerifyValidByToken(c, logger, "refreshToken"); err != nil {
+			logger.Error("refreshToken verify token failed", zap.Error(err))
+			return
+		}
 	}
 }

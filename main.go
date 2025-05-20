@@ -6,6 +6,7 @@ import (
 	"app/internal/middleware"
 	"app/internal/router"
 	"fmt"
+	"go.uber.org/zap"
 	"os"
 
 	"app/internal/common/log"
@@ -25,7 +26,12 @@ func main() {
 	} else {
 		gin.SetMode(gin.DebugMode) // 开发环境
 	}
-	defer logger.Sync()
+	defer func(logger *zap.Logger) {
+		err := logger.Sync()
+		if err != nil {
+			logger.Error("failed to sync logger", zap.Error(err))
+		}
+	}(logger)
 	// recover恢复
 	r.Use(middleware.RecoveryWithZap(logger))
 	middleLog := middleware.NewLogger(logger)

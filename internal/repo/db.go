@@ -1,7 +1,6 @@
 package repo
 
 import (
-	"app/internal/model"
 	"log"
 	"os"
 
@@ -28,21 +27,19 @@ func InitDB() *Repo {
 		SkipInitializeWithVersion: false, // 根据当前 MySQL 版本自动配置
 
 	}), &gorm.Config{
-		DisableForeignKeyConstraintWhenMigrating: true,
+		DisableForeignKeyConstraintWhenMigrating: false,
 	})
 	if err != nil {
 		log.Fatalf("failed to connect database: %v", err)
 	}
 
 	// 自动迁移模型（可选）
-	db.AutoMigrate(&model.User{})
-
-	// DB = db
+	Migrate(db)
 	return &Repo{DB: db}
 }
 
 func ProvideDB(container *dig.Container) {
-	container.Provide(InitDB) // 提供 *repo.Repo
+	container.Provide(InitDB)
 	container.Provide(func(r *Repo) *gorm.DB {
 		return r.DB
 	})
