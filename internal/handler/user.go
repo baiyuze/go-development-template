@@ -1,14 +1,11 @@
 package handler
 
 import (
-	// AppContext "app/internal/app_ontext"
-
 	errs "app/internal/common/error"
 	log "app/internal/common/log"
 	"app/internal/dto"
 	"app/internal/grpc/client"
 	"app/internal/grpc/container"
-
 	"app/internal/service"
 	"fmt"
 	"net/http"
@@ -43,20 +40,18 @@ func ProviderUserHandler(container *dig.Container) {
 }
 
 func (h *UserHandler) Login(c *gin.Context) {
-	// logger := h.logx.WithContext(c)
+	logger := h.log.WithContext(c)
 
 	var body dto.LoginBody
 	err := c.ShouldBindJSON(&body)
 	if err != nil {
-		errs.MustNoErr(err, "请检查账号密码")
+		errs.AbortWithServerError(err, "请检查账号密码")
 	} else {
 
 		result := h.service.Login(c, body)
 		if result.Error != nil {
-			err := errs.MustReturnErr(c, result.Error.Error())
-			if err != nil {
-				return
-			}
+			errs.FailWithJSON(c, result.Error.Error())
+			logger.Error(result.Error.Error())
 			return
 		}
 
@@ -64,6 +59,34 @@ func (h *UserHandler) Login(c *gin.Context) {
 			"token": result.Data,
 		}))
 	}
+}
+
+// Register 注册
+func (h *UserHandler) Register(c *gin.Context) {
+	logger := h.log.WithContext(c)
+
+	var body dto.RegBody
+	if err := c.ShouldBindJSON(&body); err != nil {
+		errs.FailWithJSON(c, err.Error())
+		logger.Error(err.Error())
+		return
+	}
+
+	account := body.Account
+	if account != nil || body.Password != nil {
+		if err := h.service.Register(c, body); err != nil {
+			errs.FailWithJSON(c, err.Error())
+			return
+		}
+		c.JSON(http.StatusOK, dto.Ok[any](nil))
+		return
+	} else {
+		errs.FailWithJSON(c, "账号或密码不存在")
+		return
+	}
+
+	//fmt.Printf("%+v", body, "--->")
+
 }
 
 // TestAuth 用来验证是否token
@@ -77,13 +100,14 @@ func (h *UserHandler) HomeHandler(c *gin.Context) {
 
 	user, err := h.service.GetUserOne()
 	if err != nil {
-		errs.MustNoErr(err, "错误了啊")
+		errs.AbortWithServerError(err, "错误了啊")
 	} else {
 		fmt.Printf("查询到的用户: %+v\n", user)
 	}
 	c.JSON(http.StatusOK, user)
 }
 
+// TestRpc 测试GRPC
 func (h *UserHandler) TestRpc(c *gin.Context) {
 
 	userValid, err := client.SayHello(h.clients)

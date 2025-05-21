@@ -28,4 +28,5 @@ components.d.ts
 *.sln
 *.sw?
 tmp/*
+tmp/build-errors.log
 bin/

@@ -20,6 +20,20 @@ const (
 	CodeServerErr = 500
 )
 
+func ServiceFail[T any](err error) Result[T] {
+	var zero T
+	return Result[T]{
+		Data:  zero,
+		Error: err,
+	}
+}
+func ServiceSuccess[T any](data T) Result[T] {
+	return Result[T]{
+		Data:  data,
+		Error: nil,
+	}
+}
+
 // Ok 快捷构造函数
 func Ok[T any](data T) Response[T] {
 	return Response[T]{

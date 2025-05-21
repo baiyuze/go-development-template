@@ -16,6 +16,8 @@ func RegisterUserRoutes(r *gin.Engine, container *dig.Container) {
 	err := container.Invoke(func(userHandler *handler.UserHandler) {
 		// 登录
 		router.POST("/login", userHandler.Login)
+		//注册
+		router.POST("/register", userHandler.Register)
 
 		router.GET("/auth", userHandler.TestAuth)
 		// home

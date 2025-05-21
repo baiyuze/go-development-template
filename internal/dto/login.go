@@ -7,6 +7,14 @@ type LoginBody struct {
 	Password string `json:"password"`
 }
 
+type RegBody struct {
+	Account  *string `json:"account,omitempty"`
+	Password *string `json:"password,omitempty"`
+	Name     *string `json:"name,omitempty"`
+	Phone    *string `json:"phone,omitempty"`
+	Email    *string `json:"email,omitempty"`
+}
+
 type UserInfo struct {
 	Account string  `json:"account"`
 	Name    string  `json:"name"`

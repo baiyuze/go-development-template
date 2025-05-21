@@ -1,7 +1,6 @@
 package service
 
 import (
-	errs "app/internal/common/error"
 	"app/internal/common/jwt"
 	"app/internal/common/log"
 	"app/internal/dto"
@@ -19,6 +18,7 @@ import (
 type UserService interface {
 	GetUserOne() (*model.User, error)
 	Login(c *gin.Context, body dto.LoginBody) dto.Result[dto.LoginResult]
+	Register(c *gin.Context, body dto.RegBody) error
 }
 
 type userService struct {
@@ -47,12 +47,11 @@ func (s *userService) GetUserOne() (*model.User, error) {
 
 // Login 登录进行校验返回token
 func (s *userService) Login(c *gin.Context, body dto.LoginBody) dto.Result[dto.LoginResult] {
-	// logger := s.log.WithContext(c)
 	var user model.User
 
 	result := s.db.Where("account = ?", body.Account).First(&user)
 	if result.Error != nil {
-		return dto.Result[dto.LoginResult]{Data: dto.LoginResult{}, Error: errors.New("密码错误,请检查账号密码")}
+		return dto.ServiceFail[dto.LoginResult](errors.New("密码错误,请检查账号密码"))
 	}
 	psd := sha256.Sum256([]byte(body.Password))
 	hashPsd := hex.EncodeToString(psd[:])
@@ -61,18 +60,16 @@ func (s *userService) Login(c *gin.Context, body dto.LoginBody) dto.Result[dto.L
 		//两小时过期
 		sign, err := jwt.Auth(user, time.Now().Add(2*time.Hour).Unix())
 		if err != nil {
-			errs.MustNoErr(err, "token创建失败")
-			return dto.Result[dto.LoginResult]{Data: dto.LoginResult{}, Error: err}
+			return dto.ServiceFail[dto.LoginResult](err)
 		}
 		//7天过期
 		refreshToken, err := jwt.Auth(user,
 			time.Now().Add(24*7*time.Hour).Unix())
 		if err != nil {
-			errs.MustNoErr(err, "token创建失败")
-			return dto.Result[dto.LoginResult]{Data: dto.LoginResult{},
-				Error: err}
+			return dto.ServiceFail[dto.LoginResult](err)
 		}
-		return dto.Result[dto.LoginResult]{Data: dto.LoginResult{
+
+		return dto.ServiceSuccess(dto.LoginResult{
 			Token:        sign,
 			RefreshToken: refreshToken,
 			UserInfo: &dto.UserInfo{
@@ -80,8 +77,36 @@ func (s *userService) Login(c *gin.Context, body dto.LoginBody) dto.Result[dto.L
 				Name:    user.Name,
 				Id:      float64(user.ID),
 			},
-		}, Error: nil}
-
+		})
 	}
-	return dto.Result[dto.LoginResult]{Data: dto.LoginResult{}, Error: errors.New("密码错误,请检查账号密码")}
+	return dto.ServiceFail[dto.LoginResult](errors.New("密码错误,请检查账号密码"))
+}
+
+// Register 注册
+func (s *userService) Register(c *gin.Context, body dto.RegBody) error {
+
+	logger := s.log.WithContext(c)
+	var user model.User
+	result := s.db.Where("account = ?", *body.Account).Find(&user)
+
+	if result.Error == nil {
+		if user.Account == *body.Account {
+			return errors.New(*body.Account + "当前账号已经存在")
+		}
+	}
+	psd := sha256.Sum256([]byte(*body.Password))
+	hashPsd := hex.EncodeToString(psd[:])
+	if body.Password != nil {
+		result := s.db.Create(&model.User{
+			Account:    *body.Account,
+			Password:   hashPsd,
+			Name:       *body.Name,
+			CreateTime: time.Now(),
+		})
+		if result.Error != nil {
+			logger.Error(result.Error.Error())
+			return result.Error
+		}
+	}
+	return nil
 }
