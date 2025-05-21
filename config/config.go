@@ -10,6 +10,7 @@ import (
 )
 
 func InitConfig() (*dto.Config, error) {
+
 	envName := os.Getenv("APP_ENV")
 	var c dto.Config
 
