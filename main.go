@@ -2,6 +2,7 @@ package main
 
 import (
 	"app/internal/di"
+	server "app/internal/grpc"
 	"app/internal/middleware"
 	"app/internal/router"
 	"fmt"
@@ -40,13 +41,12 @@ func main() {
 	// 日志
 	r.Use(middleLog.Logger)
 
-	// 认证白名单
+	// 白名单，暂时无用
 	r.Use(middleware.AuthWhiteList)
-	r.Use(middleware.Jwt)
 
 	container := di.NewContainer(logger)
 	// 初始化grpc服务
-	//go server.IntServer(container)
+	go server.IntServer(container)
 
 	router.RegisterRoutes(r, container)
 

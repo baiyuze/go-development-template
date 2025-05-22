@@ -153,6 +153,17 @@ grpcurl -plaintext localhost:50051 app.HelloService.SayHello
     SQL_URL	数据库连接字符串	user:pwd@tcp(…)
 
 ⸻
+#### 路由使用，传递 middleware.Jwt(false|true)来确定是否使用jwt认证
+```cgo
+// 登录
+router.POST("/login", middleware.Jwt(false), userHandler.Login)
+//注册
+router.POST("/register", middleware.Jwt(false), userHandler.Register)
+//获取列表
+router.GET("/list", middleware.Jwt(true), userHandler.List)
+//jwt认证测试
+router.GET("/auth", middleware.Jwt(true), userHandler.TestAuth)
+```
 
 #### 📌 后续规划（TODO）
 
