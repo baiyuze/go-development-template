@@ -13,17 +13,15 @@ import (
 func RegisterUserRoutes(r *gin.Engine, container *dig.Container) {
 
 	router := r.Group("user")
-	err := container.Invoke(func(userHandler *handler.UserHandler) {
+	err := container.Invoke(func(userHandler *handler.UserHandler, rpcHandler *handler.RpcHandler) {
 		// 登录
 		router.POST("/login", userHandler.Login)
 		//注册
 		router.POST("/register", userHandler.Register)
+		//获取列表
+		router.GET("/list", userHandler.List)
 
 		router.GET("/auth", userHandler.TestAuth)
-		// home
-		router.GET("/", userHandler.HomeHandler)
-		// 测试RPC
-		router.GET("/test", userHandler.TestRpc)
 	})
 	if err != nil {
 		fmt.Printf("注入 handler 失败: %v\n", err)

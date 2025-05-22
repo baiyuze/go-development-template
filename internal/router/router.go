@@ -9,8 +9,8 @@ import (
 )
 
 // RegisterRoutes 注册所有路由
-func RegisterRoutes(r *gin.Engine, contanier *dig.Container) {
+func RegisterRoutes(r *gin.Engine, container *dig.Container) {
 
-	RegisterUserRoutes(r, contanier)
-
+	RegisterUserRoutes(r, container)
+	RegisterRpcRoutes(r, container)
 }

@@ -6,7 +6,6 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -66,12 +65,10 @@ func VerifyValidByToken(c *gin.Context, logger *zap.Logger, tokenKey string) err
 
 		if err != nil {
 			logger.Error(err.Error())
-			c.JSON(http.StatusUnauthorized, dto.Fail(http.StatusUnauthorized, err.Error()))
-			c.Abort()
+
 			return err
 		} else {
 			c.Set("userInfo", userInfo)
-			c.Next()
 			return nil
 		}
 
@@ -79,8 +76,7 @@ func VerifyValidByToken(c *gin.Context, logger *zap.Logger, tokenKey string) err
 		err := errors.New("token不存在")
 		errMsg := err.Error()
 		logger.Error(errMsg)
-		c.JSON(http.StatusUnauthorized, dto.Fail(http.StatusUnauthorized, errMsg))
-		c.Abort()
+		
 		return err
 	}
 }

@@ -4,14 +4,12 @@ import (
 	errs "app/internal/common/error"
 	log "app/internal/common/log"
 	"app/internal/dto"
-	"app/internal/grpc/client"
 	"app/internal/grpc/container"
 	"app/internal/service"
-	"fmt"
-	"net/http"
-
+	"app/utils"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/dig"
+	"net/http"
 )
 
 type UserHandler struct {
@@ -37,6 +35,11 @@ func ProviderUserHandler(container *dig.Container) {
 	if err != nil {
 		return
 	}
+}
+
+// HomeHandler 处理首页请求
+func (h *UserHandler) HomeHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, "首页")
 }
 
 func (h *UserHandler) Login(c *gin.Context) {
@@ -85,36 +88,23 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
-	//fmt.Printf("%+v", body, "--->")
+}
+func (h *UserHandler) List(c *gin.Context) {
+	pageNum := c.Query("pageNum")
+	pageSize := c.Query("pageSize")
 
+	result, err := h.service.List(c, utils.HandleQuery(pageNum, pageSize))
+	if err != nil {
+		errs.FailWithJSON(c, err.Error())
+	}
+	if err != nil {
+		errs.FailWithJSON(c, err.Error())
+	} else {
+		c.JSON(http.StatusOK, dto.Ok(result.Data))
+	}
 }
 
 // TestAuth 用来验证是否token
 func (h *UserHandler) TestAuth(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.Ok("成功"))
-}
-
-// HomeHandler 处理首页请求
-func (h *UserHandler) HomeHandler(c *gin.Context) {
-	// logger := h.logx.WithContext(c)
-
-	user, err := h.service.GetUserOne()
-	if err != nil {
-		errs.AbortWithServerError(err, "错误了啊")
-	} else {
-		fmt.Printf("查询到的用户: %+v\n", user)
-	}
-	c.JSON(http.StatusOK, user)
-}
-
-// TestRpc 测试GRPC
-func (h *UserHandler) TestRpc(c *gin.Context) {
-
-	userValid, err := client.SayHello(h.clients)
-	if err != nil {
-		fmt.Println("查询失败:", err.Error())
-	} else {
-		fmt.Printf("查询数据: %+v\n", userValid)
-	}
-	c.JSON(http.StatusOK, userValid)
 }

@@ -19,6 +19,7 @@ type UserService interface {
 	GetUserOne() (*model.User, error)
 	Login(c *gin.Context, body dto.LoginBody) dto.Result[dto.LoginResult]
 	Register(c *gin.Context, body dto.RegBody) error
+	List(context *gin.Context, query dto.ListQuery) (dto.Result[dto.List[model.User]], error)
 }
 
 type userService struct {
@@ -34,7 +35,9 @@ func NewUserService(
 }
 
 func ProvideUserService(container *dig.Container) {
-	container.Provide(NewUserService)
+	if err := container.Provide(NewUserService); err != nil {
+		panic(err)
+	}
 }
 
 func (s *userService) GetUserOne() (*model.User, error) {
@@ -55,7 +58,7 @@ func (s *userService) Login(c *gin.Context, body dto.LoginBody) dto.Result[dto.L
 	}
 	psd := sha256.Sum256([]byte(body.Password))
 	hashPsd := hex.EncodeToString(psd[:])
-	if user.Account == body.Account && hashPsd == user.Password {
+	if user.Account == body.Account && hashPsd == *user.Password {
 		// 调用jwt
 		//两小时过期
 		sign, err := jwt.Auth(user, time.Now().Add(2*time.Hour).Unix())
@@ -99,7 +102,7 @@ func (s *userService) Register(c *gin.Context, body dto.RegBody) error {
 	if body.Password != nil {
 		result := s.db.Create(&model.User{
 			Account:    *body.Account,
-			Password:   hashPsd,
+			Password:   &hashPsd,
 			Name:       *body.Name,
 			CreateTime: time.Now(),
 		})
@@ -109,4 +112,37 @@ func (s *userService) Register(c *gin.Context, body dto.RegBody) error {
 		}
 	}
 	return nil
+}
+
+func (s *userService) Update(c *gin.Context, body dto.RegBody) error { return nil }
+
+// List 获取所有的用户数据
+func (s *userService) List(c *gin.Context, query dto.ListQuery) (dto.Result[dto.List[model.User]], error) {
+	logger := s.log.WithContext(c)
+	users := make([]model.User, 0)
+	limit := query.PageSize
+	offset := query.PageNum*query.PageSize - query.PageSize
+
+	if result := s.db.
+		Select(
+			"id",
+			"name",
+			"account",
+			"create_time",
+			"update_time",
+			"role_id").Limit(limit).Offset(offset).Order("create_time asc").Find(&users); result.Error != nil {
+		logger.Error(result.Error.Error())
+		return dto.ServiceFail[dto.List[model.User]](result.Error), result.Error
+	}
+	var count int64
+	if result := s.db.Model(&model.User{}).Count(&count); result.Error != nil {
+		logger.Error(result.Error.Error())
+	}
+	data := dto.ServiceSuccess(dto.List[model.User]{
+		Items:    users,
+		PageSize: query.PageSize,
+		PageNum:  query.PageNum,
+		Total:    count,
+	})
+	return data, nil
 }

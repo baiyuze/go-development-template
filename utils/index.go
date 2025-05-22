@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"app/internal/dto"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"unicode"
 
@@ -98,5 +100,21 @@ func RenameFile(dir string, targetName string, oldName string, entity ...string)
 		if !isDirectory(slashDir) {
 			cp.Copy(slashDir, targetEntityDir)
 		}
+	}
+}
+
+// HandleQuery 处理参数query
+func HandleQuery(pageNum string, pageSize string) dto.ListQuery {
+	num, err := strconv.Atoi(pageNum)
+	size, err := strconv.Atoi(pageSize)
+	if pageNum == "" || err != nil {
+		num = 1
+	}
+	if pageSize == "" || err != nil {
+		size = 50
+	}
+	return dto.ListQuery{
+		PageNum:  num,
+		PageSize: size,
 	}
 }

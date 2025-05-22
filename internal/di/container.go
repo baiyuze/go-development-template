@@ -17,9 +17,11 @@ func NewContainer(logger *zap.Logger) *dig.Container {
 	// 注册各模块的依赖
 	container := dig.New()
 	// 注入logger
-	container.Provide(func() *zap.Logger {
+	if err := container.Provide(func() *zap.Logger {
 		return logger
-	})
+	}); err != nil {
+		logger.Fatal("日志注入失败", zap.Error(err))
+	}
 	// 公共日志管理器
 	log.NewProvideLogger(container)
 	// 获取客户端grpc
@@ -28,10 +30,10 @@ func NewContainer(logger *zap.Logger) *dig.Container {
 	config.ProvideConfig(container)
 	// 数据库
 	repo.ProvideDB(container)
-	// 用户服务
-	service.ProvideUserService(container)
+	// 服务
+	service.Provide(container)
 	// controller
-	handler.ProviderUserHandler(container)
+	handler.Provide(container)
 
 	return container
 }

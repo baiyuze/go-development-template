@@ -9,7 +9,7 @@ type User struct {
 	Name       string    `gorm:"type:char(30);not null" json:"name"`
 	Account    string    `gorm:"type:char(30);not null" json:"account"`
 	CreateTime time.Time `gorm:"type:datetime(6);" json:"create_time"` // 注意：这是 char 类型而不是 time 类型
-	Password   string    `gorm:"type:varchar(255);not null" json:"password"`
+	Password   *string   `gorm:"type:varchar(255);not null" json:"password,omitempty"`
 	//加*表示可以为null
 	RoleId     *int      `gorm:"type:int" json:"role_id"`
 	Role       *Roles    `gorm:"foreignKey:RoleId" json:"role"`

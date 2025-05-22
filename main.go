@@ -2,7 +2,6 @@ package main
 
 import (
 	"app/internal/di"
-	server "app/internal/grpc"
 	"app/internal/middleware"
 	"app/internal/router"
 	"fmt"
@@ -46,12 +45,9 @@ func main() {
 	r.Use(middleware.Jwt)
 
 	container := di.NewContainer(logger)
-
-	go func() {
-		go server.IntServer(container)
-	}()
-
 	// 初始化grpc服务
+	//go server.IntServer(container)
+
 	router.RegisterRoutes(r, container)
 
 	// 运行服务器
