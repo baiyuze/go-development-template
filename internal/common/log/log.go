@@ -92,6 +92,7 @@ func InitLogger() (*zap.Logger, error) {
 	var core zapcore.Core
 	// dev
 	if !isProduction {
+		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 		consoleEncoder := zapcore.NewConsoleEncoder(encoderConfig)
 		consoleCore := zapcore.NewCore(consoleEncoder, consoleSyncer, level)
 		// 合并 core
@@ -102,7 +103,6 @@ func InitLogger() (*zap.Logger, error) {
 		// JSON 编码器（用于文件）
 		jsonEncoder := zapcore.NewJSONEncoder(encoderConfig)
 		// Console 编码器（带颜色，用于终端）
-		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 		fileCore := zapcore.NewCore(jsonEncoder, fileSyncer, level)
 		core = zapcore.NewTee(
 			fileCore,

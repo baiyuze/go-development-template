@@ -7,6 +7,7 @@ import (
 type Roles struct {
 	ID          int       `gorm:"primaryKey;autoIncrement" json:"id"`
 	Name        string    `gorm:"type:char(30);not null" json:"name"`
+	Users       []User    `gorm:"many2many:user_roles"`
 	Description string    `gorm:"type:char(30);" json:"description"`
 	CreateTime  time.Time `gorm:"type:datetime(6);" json:"create_time"` // 注意：这是 char 类型而不是 time 类型
 	UpdateTime  time.Time `gorm:"type:datetime(6);autoUpdateTime" json:"update_time"`

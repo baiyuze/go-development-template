@@ -11,8 +11,7 @@ func Migrate(db *gorm.DB) {
 		&model.User{},
 		&model.Roles{},
 		&model.Permissions{},
-		&model.RolePermissions{},
-		&model.UserRoles{}); err != nil {
+		&model.RolePermissions{}); err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
 	}
 }

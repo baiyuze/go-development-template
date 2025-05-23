@@ -19,7 +19,8 @@ type UserService interface {
 	GetUserOne() (*model.User, error)
 	Login(c *gin.Context, body dto.LoginBody) dto.Result[dto.LoginResult]
 	Register(c *gin.Context, body dto.RegBody) error
-	List(context *gin.Context, query dto.ListQuery) (dto.Result[dto.List[model.User]], error)
+	List(context *gin.Context, query dto.ListQuery) (dto.Result[dto.List[dto.UserWithRole]], error)
+	Update(c *gin.Context, body dto.UserRoleRequest) error
 }
 
 type userService struct {
@@ -114,31 +115,52 @@ func (s *userService) Register(c *gin.Context, body dto.RegBody) error {
 	return nil
 }
 
-func (s *userService) Update(c *gin.Context, body dto.RegBody) error { return nil }
+// Update 更新
+func (s *userService) Update(c *gin.Context, body dto.UserRoleRequest) error {
+
+	var user model.User
+	if err := s.db.First(&user, body.ID).Error; err != nil {
+		return err
+	}
+	//先查出来用户，再查出来角色对象，然后通过用户去更新替换角色id
+	// 查出要绑定的角色对象
+	var roles []model.Roles
+	if err := s.db.Where("id IN ?", body.RoleIds).Find(&roles).Error; err != nil {
+		return err
+	}
+
+	if err := s.db.Model(&user).Association("Roles").Replace(&roles); err != nil {
+		return err
+	}
+	return nil
+}
 
 // List 获取所有的用户数据
-func (s *userService) List(c *gin.Context, query dto.ListQuery) (dto.Result[dto.List[model.User]], error) {
+func (s *userService) List(c *gin.Context, query dto.ListQuery) (dto.Result[dto.List[dto.UserWithRole]], error) {
 	logger := s.log.WithContext(c)
-	users := make([]model.User, 0)
+	var users []dto.UserWithRole
 	limit := query.PageSize
 	offset := query.PageNum*query.PageSize - query.PageSize
 
 	if result := s.db.
+		Table("user").
 		Select(
-			"id",
-			"name",
-			"account",
-			"create_time",
-			"update_time",
-			"role_id").Limit(limit).Offset(offset).Order("create_time asc").Find(&users); result.Error != nil {
+			"user.id, user.name, user.account, user.create_time, user.update_time").
+		//", roles.name as role_name, user.role_id")
+		//Joins("LEFT JOIN roles ON user.role_id = roles.id").
+		Limit(limit).
+		Offset(offset).
+		Order("create_time asc").
+		Scan(&users); result.Error != nil {
 		logger.Error(result.Error.Error())
-		return dto.ServiceFail[dto.List[model.User]](result.Error), result.Error
+		return dto.ServiceFail[dto.List[dto.UserWithRole]](result.Error), result.Error
 	}
 	var count int64
 	if result := s.db.Model(&model.User{}).Count(&count); result.Error != nil {
 		logger.Error(result.Error.Error())
+		return dto.ServiceFail[dto.List[dto.UserWithRole]](result.Error), result.Error
 	}
-	data := dto.ServiceSuccess(dto.List[model.User]{
+	data := dto.ServiceSuccess(dto.List[dto.UserWithRole]{
 		Items:    users,
 		PageSize: query.PageSize,
 		PageNum:  query.PageNum,

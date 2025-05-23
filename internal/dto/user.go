@@ -1,6 +1,9 @@
 package dto
 
-import "github.com/golang-jwt/jwt/v5"
+import (
+	"github.com/golang-jwt/jwt/v5"
+	"time"
+)
 
 type LoginBody struct {
 	Account  string `json:"account"`
@@ -32,4 +35,19 @@ type LoginResult struct {
 	Token        string    `json:"token,omitempty"`
 	RefreshToken string    `json:"refreshToken,omitempty"`
 	UserInfo     *UserInfo `json:"userInfo,omitempty"`
+}
+
+type UserRoleRequest struct {
+	ID      int   `json:"id"`
+	RoleIds []int `json:"roleIds"`
+}
+
+type UserWithRole struct {
+	ID         int       `json:"id"`
+	Name       string    `json:"name"`
+	Account    string    `json:"account"`
+	CreateTime time.Time `json:"createTime"`
+	UpdateTime time.Time `json:"updateTime"`
+	RoleID     *int      `json:"roleId"`
+	RoleName   *string   `json:"roleName"`
 }

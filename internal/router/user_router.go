@@ -20,6 +20,8 @@ func RegisterUserRoutes(r *gin.Engine, container *dig.Container) {
 		router.POST("/register", middleware.Jwt(false), userHandler.Register)
 		//获取列表
 		router.GET("/list", middleware.Jwt(true), userHandler.List)
+		//修改角色
+		router.POST("/set-role", middleware.Jwt(true), userHandler.SetRole)
 		//jwt认证测试
 		router.GET("/auth", middleware.Jwt(true), userHandler.TestAuth)
 	})

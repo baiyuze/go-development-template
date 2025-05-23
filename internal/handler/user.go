@@ -96,12 +96,30 @@ func (h *UserHandler) List(c *gin.Context) {
 	result, err := h.service.List(c, utils.HandleQuery(pageNum, pageSize))
 	if err != nil {
 		errs.FailWithJSON(c, err.Error())
-	}
-	if err != nil {
-		errs.FailWithJSON(c, err.Error())
 	} else {
 		c.JSON(http.StatusOK, dto.Ok(result.Data))
 	}
+}
+
+// SetRole 修改角色，设置角色
+func (h *UserHandler) SetRole(c *gin.Context) {
+	logger := h.log.WithContext(c)
+	var body dto.UserRoleRequest
+
+	if err := c.ShouldBindJSON(&body); err != nil {
+		logger.Error(err.Error())
+		return
+	}
+
+	if len(body.RoleIds) == 0 || body.ID == 0 {
+		errs.FailWithJSON(c, "RoleIds和ID为必填")
+		return
+	}
+	if err := h.service.Update(c, body); err != nil {
+		errs.FailWithJSON(c, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, dto.Ok[any](nil))
 }
 
 // TestAuth 用来验证是否token

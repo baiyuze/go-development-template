@@ -7,6 +7,8 @@ import (
 type UserRoles struct {
 	ID          int       `gorm:"primaryKey;autoIncrement" json:"id"`
 	Name        string    `gorm:"type:char(30);not null" json:"name"`
+	RoleID      int       `gorm:"not null" json:"role_id"`
+	Role        Roles     `gorm:"foreignKey:RoleID" json:"role"`
 	UserID      int       `gorm:"not null" json:"user_id"`
 	User        User      `gorm:"foreignKey:UserID;not null" json:"user"`
 	Description string    `gorm:"type:char(30);" json:"description"`
