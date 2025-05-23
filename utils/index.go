@@ -2,6 +2,8 @@ package utils
 
 import (
 	"app/internal/dto"
+	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -117,4 +119,22 @@ func HandleQuery(pageNum string, pageSize string) dto.ListQuery {
 		PageNum:  num,
 		PageSize: size,
 	}
+}
+
+// GetLocalIP 获取本地IP
+func GetLocalIP() (string, error) {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return "", err
+	}
+	for _, addr := range addrs {
+		if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ip4 := ipnet.IP.To4(); ip4 != nil {
+				if strings.Contains(ip4.String(), "192.168.") {
+					return ip4.String(), nil
+				}
+			}
+		}
+	}
+	return "", fmt.Errorf("未找到非回环 IPv4 地址")
 }

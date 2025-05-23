@@ -5,6 +5,7 @@ import (
 	"app/utils"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/hashicorp/consul/api"
 	"go.uber.org/dig"
@@ -24,6 +25,10 @@ type ServiceDiscovery struct {
 func NewServiceDiscovery() *ServiceDiscovery {
 
 	config := api.DefaultConfig()
+	addr := os.Getenv("ADDR")
+	if len(addr) != 0 {
+		config.Address = addr
+	}
 	// Grpc 等待时间不能过长，不然不能访问
 	client, err := api.NewClient(config)
 	if err != nil {
