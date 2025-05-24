@@ -10,8 +10,7 @@ func Migrate(db *gorm.DB) {
 	if err := db.AutoMigrate(
 		&model.User{},
 		&model.Roles{},
-		&model.Permissions{},
-		&model.RolePermissions{}); err != nil {
+		&model.Permissions{}); err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
 	}
 }
