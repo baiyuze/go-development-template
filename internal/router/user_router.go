@@ -10,18 +10,17 @@ import (
 )
 
 // RegisterUserRoutes 注册所有路由
-func RegisterUserRoutes(r *gin.Engine, container *dig.Container) {
+func RegisterUserRoutes(r *gin.RouterGroup, container *dig.Container) {
 
-	router := r.Group("user")
+	router := r.Group("users")
+
 	err := container.Invoke(func(userHandler *handler.UserHandler, rpcHandler *handler.RpcHandler) {
 		// 登录
 		router.POST("/login", middleware.Jwt(false), userHandler.Login)
 		//注册
 		router.POST("/register", middleware.Jwt(false), userHandler.Register)
 		//获取列表
-		router.GET("/list", middleware.Jwt(true), userHandler.List)
-		//修改角色
-		router.POST("/set-role", middleware.Jwt(true), userHandler.SetRole)
+		router.GET("/", middleware.Jwt(true), userHandler.List)
 		//jwt认证测试
 		router.GET("/auth", middleware.Jwt(true), userHandler.TestAuth)
 	})

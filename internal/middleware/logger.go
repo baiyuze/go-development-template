@@ -34,6 +34,7 @@ func (l *LoggerMiddle) Logger(c *gin.Context) {
 			zap.String("agent", c.Request.UserAgent()),
 		)
 		c.Next()
+		
 	}
 
 }

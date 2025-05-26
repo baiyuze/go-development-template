@@ -124,12 +124,12 @@ func (s *userService) Update(c *gin.Context, body dto.UserRoleRequest) error {
 	}
 	//先查出来用户，再查出来角色对象，然后通过用户去更新替换角色id
 	// 查出要绑定的角色对象
-	var roles []model.Roles
+	var roles []model.Role
 	if err := s.db.Where("id IN ?", body.RoleIds).Find(&roles).Error; err != nil {
 		return err
 	}
 
-	if err := s.db.Model(&user).Association("Roles").Replace(&roles); err != nil {
+	if err := s.db.Model(&user).Association("Role").Replace(&roles); err != nil {
 		return err
 	}
 	return nil
@@ -143,9 +143,9 @@ func (s *userService) List(c *gin.Context, query dto.ListQuery) (dto.Result[dto.
 	offset := query.PageNum*query.PageSize - query.PageSize
 
 	if result := s.db.
-		Table("user").
+		Table("users").
 		Select(
-			"user.id, user.name, user.account, user.create_time, user.update_time").
+			"users.id, users.name, users.account, users.create_time,  users.update_time").
 		//", roles.name as role_name, user.role_id")
 		//Joins("LEFT JOIN roles ON user.role_id = roles.id").
 		Limit(limit).

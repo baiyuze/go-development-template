@@ -10,7 +10,7 @@ import (
 )
 
 // RegisterRpcRoutes 注册所有路由
-func RegisterRpcRoutes(r *gin.Engine, container *dig.Container) {
+func RegisterRpcRoutes(r *gin.RouterGroup, container *dig.Container) {
 
 	router := r.Group("rpc")
 	err := container.Invoke(func(rpcHandler *handler.RpcHandler) {
