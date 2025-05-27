@@ -9,8 +9,8 @@ type Permission struct {
 	Name        string    `gorm:"type:char(30);not null" json:"name"`
 	Roles       []*Role   `gorm:"many2many:role_permissions"`
 	Description string    `gorm:"type:char(30);" json:"description"`
-	CreateTime  time.Time `gorm:"type:datetime(6);" json:"create_time"` // 注意：这是 char 类型而不是 time 类型
-	UpdateTime  time.Time `gorm:"type:datetime(6);autoUpdateTime" json:"update_time"`
+	CreateTime  time.Time `gorm:"type:datetime(6);" json:"createTime"`
+	UpdateTime  time.Time `gorm:"type:datetime(6);autoUpdateTime" json:"updateTime"`
 }
 
 func (Permission) TableName() string {

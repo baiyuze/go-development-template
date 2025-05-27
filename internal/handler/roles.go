@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/dig"
 	"net/http"
+	"strconv"
 )
 
 type RolesHandler struct {
@@ -38,27 +39,27 @@ func ProviderRolesHandler(container *dig.Container) {
 	}
 }
 
-// Create 注册
+// Create 创建角色
 func (h *RolesHandler) Create(c *gin.Context) {
 	logger := h.log.WithContext(c)
 
 	var body model.Role
 	if err := c.ShouldBindJSON(&body); err != nil {
-		errs.FailWithJSON(c, err.Error())
+		errs.FailWithJSON(c, err)
 		logger.Error(err.Error())
 		return
 	}
 
-	if len(body.Name) != 0 && len(body.Description) != 0 {
+	if len(body.Name) != 0 {
 
 		if err := h.service.Create(c, body); err != nil {
-			errs.FailWithJSON(c, err.Error())
+			errs.FailWithJSON(c, err)
 			return
 		}
 		c.JSON(http.StatusOK, dto.Ok[any](nil))
 		return
 	} else {
-		errs.FailWithJSON(c, "账号或密码不存在")
+		errs.FailWithJSON(c, errs.New("角色名必填"))
 		return
 	}
 
@@ -69,28 +70,79 @@ func (h *RolesHandler) List(c *gin.Context) {
 
 	result, err := h.service.List(c, utils.HandleQuery(pageNum, pageSize))
 	if err != nil {
-		errs.FailWithJSON(c, err.Error())
+		errs.FailWithJSON(c, err)
 	} else {
 		c.JSON(http.StatusOK, dto.Ok(result.Data))
 	}
 }
 
+// Delete 删除角色
+func (h *RolesHandler) Delete(c *gin.Context) {
+	//logger := h.log.WithContext(c)
+	var body dto.DeleteIds
+
+	if err := c.ShouldBindJSON(&body); err != nil {
+		errs.FailWithJSON(c, err)
+		return
+	}
+	if err := h.service.Delete(c, body); err != nil {
+
+		errs.FailWithJSON(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, dto.Ok[any](nil))
+}
+
+// Update 修改角色信息
+func (h *RolesHandler) Update(c *gin.Context) {
+	var roleId int
+	id := c.Param("id")
+	var role dto.Role
+	if len(id) == 0 {
+		errs.FailWithJSON(c, errs.New("id不能为空"))
+		return
+	}
+
+	if currentId, err := strconv.Atoi(id); err != nil {
+		errs.FailWithJSON(c, err)
+		return
+	} else {
+		roleId = currentId
+	}
+
+	if err := c.ShouldBindJSON(&role); err != nil {
+		errs.FailWithJSON(c, err)
+		return
+	}
+
+	if len(role.Name) == 0 {
+		errs.FailWithJSON(c, errs.New("name不能为空"))
+		return
+	}
+
+	if err := h.service.Update(c, roleId, &role); err != nil {
+		errs.FailWithJSON(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, dto.Ok[any](nil))
+
+}
+
 // UpdateRole 修改角色，设置角色
 func (h *RolesHandler) UpdateRole(c *gin.Context) {
-	logger := h.log.WithContext(c)
 	var body dto.UserRoleRequest
 
 	if err := c.ShouldBindJSON(&body); err != nil {
-		logger.Error(err.Error())
+		errs.FailWithJSON(c, err)
 		return
 	}
 
 	if len(body.RoleIds) == 0 || body.ID == 0 {
-		errs.FailWithJSON(c, "RoleIds和ID为必填")
+		errs.FailWithJSON(c, errs.New("RoleIds和ID为必填"))
 		return
 	}
-	if err := h.service.Update(c, body); err != nil {
-		errs.FailWithJSON(c, err.Error())
+	if err := h.service.UpdateRole(c, body); err != nil {
+		errs.FailWithJSON(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, dto.Ok[any](nil))

@@ -44,7 +44,7 @@ func main() {
 	// 白名单，暂时无用
 	r.Use(middleware.AuthWhiteList)
 
-	container := di.NewContainer(logger)
+	container := di.NewContainer()
 	// 初始化grpc服务
 	go server.IntServer(container)
 

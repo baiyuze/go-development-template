@@ -1,6 +1,7 @@
 package errs
 
 import (
+	"go.uber.org/zap"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,8 +15,11 @@ func AbortWithServerError(err error, msg string) {
 }
 
 // FailWithJSON 请求失败，返回错误响应
-func FailWithJSON(c *gin.Context, msg string) {
-	errJson := NewPanic(500, msg, nil)
-	c.JSON(http.StatusForbidden, errJson)
-	c.Abort() // 终止后续中间件和请求处理
+func FailWithJSON(c *gin.Context, err error) {
+	if l, exists := c.Get("logger"); exists {
+		if logger, ok := l.(*zap.Logger); ok {
+			logger.Error(err.Error(), zap.String("path", c.FullPath()))
+		}
+	}
+	c.AbortWithStatusJSON(http.StatusForbidden, NewPanic(500, err.Error(), nil))
 }

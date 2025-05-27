@@ -14,7 +14,7 @@ import (
 )
 
 type LoggerWithContext struct {
-	logger *zap.Logger
+	//logger *zap.Logger
 }
 
 // GetLogger 获取logger
@@ -29,14 +29,14 @@ func GetLogger(c *gin.Context) *zap.Logger {
 	return zap.NewNop()
 }
 
-// 实例化logger
-func NewLogger(logger *zap.Logger) *LoggerWithContext {
+// NewLogger 实例化logger
+func NewLogger() *LoggerWithContext {
 	return &LoggerWithContext{
-		logger: logger,
+		//logger: logger,
 	}
 }
 
-// 从context中获取logger
+// WithContext 从context中获取logger
 func (p *LoggerWithContext) WithContext(c *gin.Context) *zap.Logger {
 	l, exists := c.Get("logger")
 	zapLog := zap.NewNop()
@@ -50,7 +50,10 @@ func (p *LoggerWithContext) WithContext(c *gin.Context) *zap.Logger {
 }
 
 func NewProvideLogger(container *dig.Container) {
-	container.Provide(NewLogger)
+	err := container.Provide(NewLogger)
+	if err != nil {
+		return
+	}
 }
 
 // InitLogger 初始化日志，控制台输出彩色日志，文件输出 JSON 并支持文件轮转

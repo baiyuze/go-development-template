@@ -11,3 +11,7 @@ type List[T any] struct {
 	PageSize int   `json:"pageSize"`
 	Total    int64 `json:"total"`
 }
+
+type DeleteIds struct {
+	Ids []*int `json:"ids"`
+}
