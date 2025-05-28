@@ -1,6 +1,8 @@
 package main
 
 import (
+	_ "app/docs"
+	"app/internal/common/log"
 	"app/internal/di"
 	server "app/internal/grpc"
 	"app/internal/middleware"
@@ -8,8 +10,6 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"os"
-
-	"app/internal/common/log"
 
 	"github.com/gin-gonic/gin"
 )
@@ -49,7 +49,6 @@ func main() {
 	go server.IntServer(container)
 
 	router.RegisterRoutes(r, container)
-
 	// 运行服务器
 	err := r.Run(":8888")
 	if err != nil {

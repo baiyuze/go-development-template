@@ -21,8 +21,11 @@ func RegisterUserRoutes(r *gin.RouterGroup, container *dig.Container) {
 		router.POST("/register", middleware.Jwt(false), userHandler.Register)
 		//获取列表
 		router.GET("/", middleware.Jwt(true), userHandler.List)
+		// 更新用户角色
+		router.PUT("/:id", middleware.Jwt(true), userHandler.UpdateRole)
 		//jwt认证测试
 		router.GET("/auth", middleware.Jwt(true), userHandler.TestAuth)
+
 	})
 	if err != nil {
 		fmt.Printf("注入 handler 失败: %v\n", err)

@@ -42,6 +42,10 @@ type UserRoleRequest struct {
 	RoleIds []int `json:"roleIds"`
 }
 
+type User struct {
+	Roles []int `json:"roles,omitempty"`
+}
+
 type UserWithRole struct {
 	ID         int       `json:"id"`
 	Name       string    `json:"name"`

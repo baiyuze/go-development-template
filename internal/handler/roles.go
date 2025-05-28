@@ -40,6 +40,12 @@ func ProviderRolesHandler(container *dig.Container) {
 }
 
 // Create 创建角色
+// @Summary 创建角色
+// @Tags 角色模块
+// @Accept  json
+// @Params data body model.Role
+// @Success 200  {object} dto.Response[any]
+// @Router /api/roles [post]
 func (h *RolesHandler) Create(c *gin.Context) {
 	logger := h.log.WithContext(c)
 
@@ -64,6 +70,15 @@ func (h *RolesHandler) Create(c *gin.Context) {
 	}
 
 }
+
+// List 角色列表
+// @Summary 角色列表
+// @Tags 角色模块
+// @Accept  json
+// @Param pageNum query int false "页码"
+// @Param pageSize query int false "每页数量"
+// @Success 200  {object} dto.Response[dto.List[model.Role]]
+// @Router /api/roles/list [get]
 func (h *RolesHandler) List(c *gin.Context) {
 	pageNum := c.Query("pageNum")
 	pageSize := c.Query("pageSize")
@@ -77,6 +92,14 @@ func (h *RolesHandler) List(c *gin.Context) {
 }
 
 // Delete 删除角色
+// @Summary 删除角色
+// @Description 删除角色
+// @Tags 角色模块
+// @Accept  json
+// @Param   id   path     int  true  "角色ID"
+// @Param   data   body   dto.DeleteIds true "要删除的角色"
+// @Success 200  {object} dto.Response[any]
+// @Router /api/users/{id} [delete]
 func (h *RolesHandler) Delete(c *gin.Context) {
 	//logger := h.log.WithContext(c)
 	var body dto.DeleteIds
@@ -94,6 +117,14 @@ func (h *RolesHandler) Delete(c *gin.Context) {
 }
 
 // Update 修改角色信息
+// @Summary 修改角色信息，支持name,description,和关联用户和关联权限表
+// @Description 修改角色信息，支持name,description,和关联用户和关联权限表
+// @Tags 角色模块
+// @Accept  json
+// @Param   id   path     int  true  "角色ID"
+// @Param   data   body     dto.Role true "角色Id"
+// @Success 200  {object} dto.Response[any]
+// @Router /api/roles/{id} [put]
 func (h *RolesHandler) Update(c *gin.Context) {
 	var roleId int
 	id := c.Param("id")
@@ -128,22 +159,44 @@ func (h *RolesHandler) Update(c *gin.Context) {
 
 }
 
-// UpdateRole 修改角色，设置角色
-func (h *RolesHandler) UpdateRole(c *gin.Context) {
-	var body dto.UserRoleRequest
+// UpdatePermissions 只修改角色权限
+// @Summary 只修改角色权限
+// @Description 只修改角色权限
+// @Tags 角色模块
+// @Accept  json
+// @Param   id   path     int  true  "角色ID"
+// @Param   data   body     dto.Role true "角色Id"
+// @Success 200  {object} dto.Response[any]
+// @Router /api/users/permissions/{id} [put]
+func (h *RolesHandler) UpdatePermissions(c *gin.Context) {
+	var roleId int
+	id := c.Param("id")
+	var role dto.Role
+	if len(id) == 0 {
+		errs.FailWithJSON(c, errs.New("id不能为空"))
+		return
+	}
 
-	if err := c.ShouldBindJSON(&body); err != nil {
+	if err := c.ShouldBindJSON(&role); err != nil {
 		errs.FailWithJSON(c, err)
 		return
 	}
-
-	if len(body.RoleIds) == 0 || body.ID == 0 {
-		errs.FailWithJSON(c, errs.New("RoleIds和ID为必填"))
+	if len(role.Permissions) == 0 {
+		errs.FailWithJSON(c, errs.New("permissions不能为空"))
 		return
 	}
-	if err := h.service.UpdateRole(c, body); err != nil {
+
+	if currentId, err := strconv.Atoi(id); err != nil {
+		errs.FailWithJSON(c, err)
+		return
+	} else {
+		roleId = currentId
+	}
+
+	if err := h.service.UpdatePermissions(c, roleId, role); err != nil {
 		errs.FailWithJSON(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, dto.Ok[any](nil))
+
 }

@@ -4,7 +4,6 @@ import (
 	"app/internal/common/log"
 	"app/internal/dto"
 	"app/internal/model"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/dig"
 	"gorm.io/gorm"
@@ -17,6 +16,8 @@ type RolesService interface {
 	List(context *gin.Context, query dto.ListQuery) (dto.Result[dto.List[model.Role]], error)
 	UpdateRole(c *gin.Context, body dto.UserRoleRequest) error
 	Update(c *gin.Context, id int, body *dto.Role) error
+	UpdateUsers(c *gin.Context, id int, role dto.Role) error
+	UpdatePermissions(c *gin.Context, id int, role dto.Role) error
 }
 
 type rolesService struct {
@@ -135,16 +136,24 @@ func (s *rolesService) Delete(c *gin.Context, body dto.DeleteIds) error {
 	return nil
 }
 
+// updateRoleInfo 更新数据表字段
+func updateRoleInfo(db *gorm.DB, id int, body *dto.Role) error {
+	if err := db.Model(&model.Role{}).Where("id = ?", id).Updates(&model.Role{
+		Name:        body.Name,
+		Description: body.Description,
+	}).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 // Update 更新角色和关联关系，包括权限ID和用户ID
 func (s *rolesService) Update(c *gin.Context, id int, body *dto.Role) error {
 	logger := s.log.WithContext(c)
 
 	if len(body.Users) == 0 && len(body.Permissions) == 0 {
 		//	只更新数据字段
-		if err := s.db.Model(&model.Role{}).Where("id = ?", id).Updates(&model.Role{
-			Name:        body.Name,
-			Description: body.Description,
-		}).Error; err != nil {
+		if err := updateRoleInfo(s.db, id, body); err != nil {
 			return err
 		}
 	} else {
@@ -152,29 +161,29 @@ func (s *rolesService) Update(c *gin.Context, id int, body *dto.Role) error {
 		if err := s.db.First(&role, id).Error; err != nil {
 			return err
 		}
-		fmt.Println(body.Users, role, "body.Users--->")
-
 		err := s.db.Transaction(func(tx *gorm.DB) error {
-			// 在事务中执行一些 db 操作（从这里开始，您应该使用 'tx' 而不是 'db'）
-			//if err := tx.Create(&Animal{Name: "Giraffe"}).Error; err != nil {
-			//	// 返回任何错误都会回滚事务
-			//	return err
-			//}
-			//
-			//if err := tx.Create(&Animal{Name: "Lion"}).Error; err != nil {
-			//	return err
-			//}
+			var users []model.User
+			var permissions []model.Permission
 
+			if err := updateRoleInfo(s.db, id, body); err != nil {
+				return err
+			}
+			if err := s.db.Find(&users, body.Users).Error; err != nil {
+				return err
+			}
+			if err := s.db.Find(&permissions, body.Permissions).Error; err != nil {
+				return err
+			}
 			//更新字段
 			if len(body.Users) != 0 {
 				//	更新依赖关系
-				if err := tx.Model(&role).Association("Users").Replace(body.Users); err != nil {
+				if err := tx.Model(&role).Association("Users").Replace(&users); err != nil {
 					return err
 				}
 			}
 			if len(body.Permissions) != 0 {
 				//	更新依赖关系
-				if err := tx.Model(&role).Association("Permissions").Replace(body.Users); err != nil {
+				if err := tx.Model(&role).Association("Permissions").Replace(&permissions); err != nil {
 					return err
 				}
 			}
@@ -187,5 +196,37 @@ func (s *rolesService) Update(c *gin.Context, id int, body *dto.Role) error {
 
 	}
 
+	return nil
+}
+
+// UpdateUsers 更新角色的用户关系表
+func (s *rolesService) UpdateUsers(c *gin.Context, id int, role dto.Role) error {
+	var users []model.User
+	if len(role.Users) != 0 {
+		//	更新依赖关系
+		if err := s.db.Model(&role).Association("Users").Replace(&users); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// UpdatePermissions 更新角色的权限关系表
+func (s *rolesService) UpdatePermissions(c *gin.Context, id int, body dto.Role) error {
+	var permissions []model.Permission
+
+	var role model.Role
+
+	if err := s.db.First(&role, id).Error; err != nil {
+		return err
+	}
+
+	if err := s.db.Find(&permissions, body.Permissions).Error; err != nil {
+		return err
+	}
+	//	更新依赖关系
+	if err := s.db.Model(&role).Association("Permissions").Replace(&permissions); err != nil {
+		return err
+	}
 	return nil
 }

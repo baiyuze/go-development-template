@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/dig"
 	"net/http"
+	"strconv"
 )
 
 type UserHandler struct {
@@ -42,6 +43,13 @@ func (h *UserHandler) HomeHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, "首页")
 }
 
+// Login 登录接口
+// @Summary 登录接口
+// @Tags 用户模块
+// @Accept  json
+// @Param   data  body dto.LoginBody  true  "用户信息"
+// @Success 200  {object} dto.Response[any]
+// @Router /api/users/login [post]
 func (h *UserHandler) Login(c *gin.Context) {
 	logger := h.log.WithContext(c)
 
@@ -65,6 +73,12 @@ func (h *UserHandler) Login(c *gin.Context) {
 }
 
 // Register 注册
+// @Summary 注册
+// @Tags 用户模块
+// @Accept  json
+// @Param   data  body dto.RegBody  true  "注册用户"
+// @Success 200  {object} dto.Response[any]
+// @Router /api/users/register [post]
 func (h *UserHandler) Register(c *gin.Context) {
 	logger := h.log.WithContext(c)
 
@@ -89,6 +103,15 @@ func (h *UserHandler) Register(c *gin.Context) {
 	}
 
 }
+
+// List 用户列表
+// @Summary 用户列表
+// @Tags 用户模块
+// @Accept  json
+// @Param pageNum query int false "页码"
+// @Param pageSize query int false "每页数量"
+// @Success 200  {object} dto.Response[dto.List[dto.UserWithRole]]
+// @Router /api/users/list [get]
 func (h *UserHandler) List(c *gin.Context) {
 	pageNum := c.Query("pageNum")
 	pageSize := c.Query("pageSize")
@@ -101,21 +124,36 @@ func (h *UserHandler) List(c *gin.Context) {
 	}
 }
 
-// SetRole 修改角色，设置角色
-func (h *UserHandler) SetRole(c *gin.Context) {
-	logger := h.log.WithContext(c)
-	var body dto.UserRoleRequest
-
-	if err := c.ShouldBindJSON(&body); err != nil {
-		logger.Error(err.Error())
+// UpdateRole 修改角色，设置角色
+// @Summary 设置角色
+// @Description 修改角色，设置角色
+// @Tags 用户模块
+// @Accept  json
+// @Param   id   path     int  true  "用户ID"
+// @Success 200  {object} dto.User
+// @Router /api/users/{id} [put]
+func (h *UserHandler) UpdateRole(c *gin.Context) {
+	var userId int
+	id := c.Param("id")
+	var user dto.User
+	if len(id) == 0 {
+		errs.FailWithJSON(c, errs.New("id不能为空"))
 		return
 	}
 
-	if len(body.RoleIds) == 0 || body.ID == 0 {
-		errs.FailWithJSON(c, errs.New("RoleIds和ID为必填"))
+	if currentId, err := strconv.Atoi(id); err != nil {
+		errs.FailWithJSON(c, err)
+		return
+	} else {
+		userId = currentId
+	}
+
+	if err := c.ShouldBindJSON(&user); err != nil {
+		errs.FailWithJSON(c, err)
 		return
 	}
-	if err := h.service.Update(c, body); err != nil {
+
+	if err := h.service.UpdateRoles(c, userId, &user); err != nil {
 		errs.FailWithJSON(c, err)
 		return
 	}

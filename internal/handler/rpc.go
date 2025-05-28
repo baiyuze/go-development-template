@@ -38,6 +38,10 @@ func ProviderRpcHandler(container *dig.Container) {
 }
 
 // TestRpc 测试GRPC
+// @Summary 测试GRPC
+// @Tags GRPC
+// @Accept  json
+// @Router /api/rpc/test [get]
 func (h *RpcHandler) TestRpc(c *gin.Context) {
 
 	userValid, err := client.SayHello(h.clients)

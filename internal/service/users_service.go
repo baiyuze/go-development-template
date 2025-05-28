@@ -21,6 +21,7 @@ type UserService interface {
 	Register(c *gin.Context, body dto.RegBody) error
 	List(context *gin.Context, query dto.ListQuery) (dto.Result[dto.List[dto.UserWithRole]], error)
 	Update(c *gin.Context, body dto.UserRoleRequest) error
+	UpdateRoles(c *gin.Context, id int, body *dto.User) error
 }
 
 type userService struct {
@@ -167,4 +168,24 @@ func (s *userService) List(c *gin.Context, query dto.ListQuery) (dto.Result[dto.
 		Total:    count,
 	})
 	return data, nil
+}
+
+// UpdateRoles 更新角色的权限关系表
+func (s *userService) UpdateRoles(c *gin.Context, id int, body *dto.User) error {
+	var roles []model.Role
+
+	var user model.User
+
+	if err := s.db.First(&user, id).Error; err != nil {
+		return err
+	}
+
+	if err := s.db.Find(&roles, body.Roles).Error; err != nil {
+		return err
+	}
+	//	更新依赖关系
+	if err := s.db.Model(&user).Association("Roles").Replace(&roles); err != nil {
+		return err
+	}
+	return nil
 }
