@@ -139,20 +139,18 @@ func (s *userService) Update(c *gin.Context, body dto.UserRoleRequest) error {
 // List 获取所有的用户数据
 func (s *userService) List(c *gin.Context, query dto.ListQuery) (dto.Result[dto.List[dto.UserWithRole]], error) {
 	logger := s.log.WithContext(c)
-	var users []dto.UserWithRole
+	var users []model.User
+	var list []dto.UserWithRole
 	limit := query.PageSize
 	offset := query.PageNum*query.PageSize - query.PageSize
 
 	if result := s.db.
-		Table("users").
-		Select(
-			"users.id, users.name, users.account, users.create_time,  users.update_time").
-		//", roles.name as role_name, user.role_id")
-		//Joins("LEFT JOIN roles ON user.role_id = roles.id").
+		Model(&model.User{}).
+		Preload("Roles").
 		Limit(limit).
 		Offset(offset).
 		Order("create_time asc").
-		Scan(&users); result.Error != nil {
+		Find(&users); result.Error != nil {
 		logger.Error(result.Error.Error())
 		return dto.ServiceFail[dto.List[dto.UserWithRole]](result.Error), result.Error
 	}
@@ -161,8 +159,26 @@ func (s *userService) List(c *gin.Context, query dto.ListQuery) (dto.Result[dto.
 		logger.Error(result.Error.Error())
 		return dto.ServiceFail[dto.List[dto.UserWithRole]](result.Error), result.Error
 	}
+	for _, user := range users {
+		var roleIds []int
+		var roleNames []string
+		for _, role := range user.Roles {
+			roleIds = append(roleIds, role.ID)
+			roleNames = append(roleNames, role.Name)
+		}
+		list = append(list, dto.UserWithRole{
+			ID:         user.ID,
+			Account:    user.Account,
+			Name:       user.Name,
+			CreateTime: user.CreateTime,
+			UpdateTime: user.UpdateTime,
+			RoleIDs:    roleIds,
+			RoleNames:  roleNames,
+		})
+
+	}
 	data := dto.ServiceSuccess(dto.List[dto.UserWithRole]{
-		Items:    users,
+		Items:    list,
 		PageSize: query.PageSize,
 		PageNum:  query.PageNum,
 		Total:    count,

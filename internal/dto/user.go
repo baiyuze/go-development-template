@@ -52,6 +52,6 @@ type UserWithRole struct {
 	Account    string    `json:"account"`
 	CreateTime time.Time `json:"createTime"`
 	UpdateTime time.Time `json:"updateTime"`
-	RoleID     *int      `json:"roleId"`
-	RoleName   *string   `json:"roleName"`
+	RoleIDs    []int     `json:"roleId"`
+	RoleNames  []string  `json:"roleName"`
 }

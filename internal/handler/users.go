@@ -111,7 +111,7 @@ func (h *UserHandler) Register(c *gin.Context) {
 // @Param pageNum query int false "页码"
 // @Param pageSize query int false "每页数量"
 // @Success 200  {object} dto.Response[dto.List[dto.UserWithRole]]
-// @Router /api/users/list [get]
+// @Router /api/users [get]
 func (h *UserHandler) List(c *gin.Context) {
 	pageNum := c.Query("pageNum")
 	pageSize := c.Query("pageSize")

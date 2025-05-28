@@ -7,11 +7,18 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"net/http"
+	"os"
 )
 
 // Jwt 过滤白名单和验证token是否有效
 func Jwt(verifyToken bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		//dev开发环境下，可以不传token
+		env := os.Getenv("ENV")
+		if env != "production" {
+			c.Next()
+			return
+		}
 		//去除白名单方式校验token，不够优雅
 		log, ok := c.Get("logger")
 		logger := log.(*zap.Logger)
