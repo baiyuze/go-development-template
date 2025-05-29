@@ -22,6 +22,7 @@ type UserService interface {
 	List(context *gin.Context, query dto.ListQuery) (dto.Result[dto.List[dto.UserWithRole]], error)
 	Update(c *gin.Context, body dto.UserRoleRequest) error
 	UpdateRoles(c *gin.Context, id int, body *dto.User) error
+	Delete(c *gin.Context, body dto.DeleteIds) error
 }
 
 type userService struct {
@@ -202,6 +203,22 @@ func (s *userService) UpdateRoles(c *gin.Context, id int, body *dto.User) error 
 	//	更新依赖关系
 	if err := s.db.Model(&user).Association("Roles").Replace(&roles); err != nil {
 		return err
+	}
+	return nil
+}
+
+// Delete 删除
+func (s *userService) Delete(c *gin.Context, body dto.DeleteIds) error {
+	var users []model.User
+	if err := s.db.Find(&users, body.Ids).Error; err != nil {
+		return err
+	}
+	// 清除用户关联
+	if err := s.db.Model(&users).Association("Roles").Clear(); err != nil {
+		return err
+	}
+	if len(body.Ids) != 0 {
+		s.db.Delete(&users, body.Ids)
 	}
 	return nil
 }

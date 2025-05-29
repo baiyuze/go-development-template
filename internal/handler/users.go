@@ -160,6 +160,30 @@ func (h *UserHandler) UpdateRole(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.Ok[any](nil))
 }
 
+// Delete 删除用户
+// @Summary 删除用户
+// @Description 删除用户
+// @Tags 用户模块
+// @Accept  json
+// @Param   id   path     int  true  "用户ID"
+// @Success 200  {object} dto.DeleteIds
+// @Router /api/users [delete]
+func (h *UserHandler) Delete(c *gin.Context) {
+	//logger := h.log.WithContext(c)
+	var body dto.DeleteIds
+
+	if err := c.ShouldBindJSON(&body); err != nil {
+		errs.FailWithJSON(c, err)
+		return
+	}
+	if err := h.service.Delete(c, body); err != nil {
+
+		errs.FailWithJSON(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, dto.Ok[any](nil))
+}
+
 // TestAuth 用来验证是否token
 func (h *UserHandler) TestAuth(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.Ok("成功"))

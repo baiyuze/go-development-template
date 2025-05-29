@@ -78,7 +78,7 @@ func (h *RolesHandler) Create(c *gin.Context) {
 // @Param pageNum query int false "页码"
 // @Param pageSize query int false "每页数量"
 // @Success 200  {object} dto.Response[dto.List[model.Role]]
-// @Router /api/roles/list [get]
+// @Router /api/roles [get]
 func (h *RolesHandler) List(c *gin.Context) {
 	pageNum := c.Query("pageNum")
 	pageSize := c.Query("pageSize")

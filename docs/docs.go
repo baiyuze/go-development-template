@@ -16,25 +16,6 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/api/roles": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "角色模块"
-                ],
-                "summary": "创建角色",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Response-any"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/roles/list": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -62,6 +43,23 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dto.Response-dto_List-model_Role"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "角色模块"
+                ],
+                "summary": "创建角色",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response-any"
                         }
                     }
                 }
@@ -117,7 +115,7 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/api/users/list": {
+        "/api/users": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -145,6 +143,33 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dto.Response-dto_List-dto_UserWithRole"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除用户",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户模块"
+                ],
+                "summary": "删除用户",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "用户ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DeleteIds"
                         }
                     }
                 }
@@ -490,10 +515,16 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "roleId": {
-                    "type": "integer"
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "roleName": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "updateTime": {
                     "type": "string"
