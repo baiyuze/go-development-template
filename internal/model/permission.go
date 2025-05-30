@@ -9,7 +9,7 @@ type Permission struct {
 	Name        string    `gorm:"type:char(30);not null" json:"name"`
 	Roles       []*Role   `gorm:"many2many:role_permissions"`
 	Description string    `gorm:"type:char(30);" json:"description"`
-	CreateTime  time.Time `gorm:"type:datetime(6);" json:"createTime"`
+	CreateTime  time.Time `gorm:"type:datetime(6);autoUpdateTime" json:"createTime"`
 	UpdateTime  time.Time `gorm:"type:datetime(6);autoUpdateTime" json:"updateTime"`
 }
 

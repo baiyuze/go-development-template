@@ -6,4 +6,6 @@ func Provide(container *dig.Container) {
 	ProviderUserHandler(container)
 	ProviderRpcHandler(container)
 	ProviderRolesHandler(container)
+	ProviderPermissionsHandler(container)
+
 }
