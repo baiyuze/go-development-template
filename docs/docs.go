@@ -23,12 +23,26 @@ const docTemplate = `{
                 "tags": [
                     "权限码模块"
                 ],
-                "summary": "删除",
+                "summary": "查询",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "pageNum",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.Response-any"
+                            "$ref": "#/definitions/dto.Response-dto_List-model_Permission"
                         }
                     }
                 }
@@ -58,6 +72,23 @@ const docTemplate = `{
                     "权限码模块"
                 ],
                 "summary": "创建",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response-any"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "权限码模块"
+                ],
+                "summary": "删除",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -424,6 +455,26 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.List-model_Permission": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Permission"
+                    }
+                },
+                "pageNum": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.List-model_Role": {
             "type": "object",
             "properties": {
@@ -496,6 +547,21 @@ const docTemplate = `{
                 },
                 "data": {
                     "$ref": "#/definitions/dto.List-dto_UserWithRole"
+                },
+                "err": {},
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.Response-dto_List-model_Permission": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "$ref": "#/definitions/dto.List-model_Permission"
                 },
                 "err": {},
                 "message": {

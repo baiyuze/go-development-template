@@ -99,8 +99,9 @@ func (h *PermissionsHandler) Update(c *gin.Context) {
 // @Summary 查询
 // @Tags 权限码模块
 // @Accept  json
-// @Params data body model.Permission
-// @Success 200  {object} dto.Response[any]
+// @Param pageNum query int false "页码"
+// @Param pageSize query int false "每页数量"
+// @Success 200  {object} dto.Response[dto.List[model.Permission]]
 // @Router /api/permissions [get]
 func (h *PermissionsHandler) List(c *gin.Context) {
 	pageNum := c.Query("pageNum")
@@ -120,7 +121,7 @@ func (h *PermissionsHandler) List(c *gin.Context) {
 // @Accept  json
 // @Params data body dto.DeleteIds
 // @Success 200  {object} dto.Response[any]
-// @Router /api/permissions [get]
+// @Router /api/permissions [delete]
 func (h *PermissionsHandler) Delete(c *gin.Context) {
 	var ids *dto.DeleteIds
 	if err := c.ShouldBindJSON(&ids); err != nil {

@@ -19,6 +19,19 @@ definitions:
       total:
         type: integer
     type: object
+  dto.List-model_Permission:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/model.Permission'
+        type: array
+      pageNum:
+        type: integer
+      pageSize:
+        type: integer
+      total:
+        type: integer
+    type: object
   dto.List-model_Role:
     properties:
       items:
@@ -67,6 +80,16 @@ definitions:
         type: integer
       data:
         $ref: '#/definitions/dto.List-dto_UserWithRole'
+      err: {}
+      message:
+        type: string
+    type: object
+  dto.Response-dto_List-model_Permission:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/dto.List-model_Permission'
       err: {}
       message:
         type: string
@@ -189,7 +212,7 @@ info:
   contact: {}
 paths:
   /api/permissions:
-    get:
+    delete:
       consumes:
       - application/json
       responses:
@@ -198,6 +221,26 @@ paths:
           schema:
             $ref: '#/definitions/dto.Response-any'
       summary: 删除
+      tags:
+      - 权限码模块
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 页码
+        in: query
+        name: pageNum
+        type: integer
+      - description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response-dto_List-model_Permission'
+      summary: 查询
       tags:
       - 权限码模块
     post:
