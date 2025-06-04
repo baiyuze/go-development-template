@@ -245,6 +245,60 @@ definitions:
 info:
   contact: {}
 paths:
+  /api/department:
+    delete:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response-any'
+      summary: 删除
+      tags:
+      - 部门
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 页码
+        in: query
+        name: pageNum
+        type: integer
+      - description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response-dto_List-model_Permission'
+      summary: 查询
+      tags:
+      - 部门
+    post:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response-any'
+      summary: 创建
+      tags:
+      - 部门
+    put:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response-any'
+      summary: 更新
+      tags:
+      - 部门
   /api/permissions:
     delete:
       consumes:
