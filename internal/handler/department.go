@@ -43,7 +43,7 @@ func ProviderDepartmentHandler(container *dig.Container) {
 // @Accept  json
 // @Params data body model.Permission
 // @Success 200  {object} dto.Response[any]
-// @Router /api/permissions [post]
+// @Router /api/department [post]
 func (h *DepartmentHandler) Create(c *gin.Context) {
 	var body *dto.ReqPermissions
 	if err := c.ShouldBindJSON(&body); err != nil {
@@ -67,7 +67,7 @@ func (h *DepartmentHandler) Create(c *gin.Context) {
 // @Accept  json
 // @Params data body model.Permission
 // @Success 200  {object} dto.Response[any]
-// @Router /api/permissions [put]
+// @Router /api/department [put]
 func (h *DepartmentHandler) Update(c *gin.Context) {
 	var body *dto.ReqPermissions
 	var permissionId int
@@ -102,7 +102,7 @@ func (h *DepartmentHandler) Update(c *gin.Context) {
 // @Param pageNum query int false "页码"
 // @Param pageSize query int false "每页数量"
 // @Success 200  {object} dto.Response[dto.List[model.Permission]]
-// @Router /api/permissions [get]
+// @Router /api/department [get]
 func (h *DepartmentHandler) List(c *gin.Context) {
 	pageNum := c.Query("pageNum")
 	pageSize := c.Query("pageSize")
@@ -121,7 +121,7 @@ func (h *DepartmentHandler) List(c *gin.Context) {
 // @Accept  json
 // @Params data body dto.DeleteIds
 // @Success 200  {object} dto.Response[any]
-// @Router /api/permissions [delete]
+// @Router /api/department [delete]
 func (h *DepartmentHandler) Delete(c *gin.Context) {
 	var ids *dto.DeleteIds
 	if err := c.ShouldBindJSON(&ids); err != nil {
