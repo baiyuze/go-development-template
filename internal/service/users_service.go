@@ -93,7 +93,7 @@ func (s *userService) Register(c *gin.Context, body dto.RegBody) error {
 
 	logger := s.log.WithContext(c)
 	var user model.User
-	result := s.db.Where("account = ?", *body.Account).Find(&user)
+	result := s.db.Where("account = ?", *body.Account).Take(&user)
 
 	if result.Error == nil {
 		if user.Account == *body.Account {

@@ -7,7 +7,7 @@ import (
 type User struct {
 	ID         int       `gorm:"primaryKey;autoIncrement" json:"id"`
 	Name       string    `gorm:"type:char(30);not null" json:"name"`
-	Account    string    `gorm:"type:char(30);not null" json:"account"`
+	Account    string    `gorm:"type:char(30);not null;uniqueIndex" json:"account"`
 	CreateTime time.Time `gorm:"type:datetime(6);" json:"createTime"`
 	Password   *string   `gorm:"type:varchar(255);not null" json:"password,omitempty"`
 	Roles      []*Role   `gorm:"many2many:user_roles"`
