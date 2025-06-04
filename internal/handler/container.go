@@ -7,5 +7,5 @@ func Provide(container *dig.Container) {
 	ProviderRpcHandler(container)
 	ProviderRolesHandler(container)
 	ProviderPermissionsHandler(container)
-
+	ProviderDepartmentHandler(container)
 }

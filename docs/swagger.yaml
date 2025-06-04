@@ -147,6 +147,36 @@ definitions:
       updateTime:
         type: string
     type: object
+  model.Department:
+    properties:
+      children:
+        description: 构造树结构用
+        items:
+          $ref: '#/definitions/model.Department'
+        type: array
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      parent_id:
+        description: 上级部门 ID，0 表示根节点
+        type: integer
+      sort:
+        description: 排序
+        type: integer
+      status:
+        description: 1=启用，0=禁用
+        type: integer
+      updated_at:
+        type: string
+      users:
+        description: 多对多关联
+        items:
+          $ref: '#/definitions/model.User'
+        type: array
+    type: object
   model.Permission:
     properties:
       createTime:
@@ -191,6 +221,10 @@ definitions:
         type: string
       createTime:
         type: string
+      departments:
+        items:
+          $ref: '#/definitions/model.Department'
+        type: array
       email:
         type: string
       id:

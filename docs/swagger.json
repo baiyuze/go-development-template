@@ -639,6 +639,49 @@
                 }
             }
         },
+        "model.Department": {
+            "type": "object",
+            "properties": {
+                "children": {
+                    "description": "构造树结构用",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Department"
+                    }
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parent_id": {
+                    "description": "上级部门 ID，0 表示根节点",
+                    "type": "integer"
+                },
+                "sort": {
+                    "description": "排序",
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "1=启用，0=禁用",
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "users": {
+                    "description": "多对多关联",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.User"
+                    }
+                }
+            }
+        },
         "model.Permission": {
             "type": "object",
             "properties": {
@@ -705,6 +748,12 @@
                 },
                 "createTime": {
                     "type": "string"
+                },
+                "departments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Department"
+                    }
                 },
                 "email": {
                     "type": "string"
