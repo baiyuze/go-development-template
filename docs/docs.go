@@ -744,7 +744,10 @@ const docTemplate = `{
                         "$ref": "#/definitions/model.Department"
                     }
                 },
-                "created_at": {
+                "created_time;autoCreateTime": {
+                    "type": "string"
+                },
+                "description": {
                     "type": "string"
                 },
                 "id": {
@@ -765,7 +768,7 @@ const docTemplate = `{
                     "description": "1=启用，0=禁用",
                     "type": "integer"
                 },
-                "updated_at": {
+                "updated_time;autoUpdateTime": {
                     "type": "string"
                 },
                 "users": {

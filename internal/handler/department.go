@@ -7,6 +7,7 @@ import (
 	"app/internal/grpc/container"
 	"app/internal/service"
 	"app/utils"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/dig"
 	"net/http"
@@ -14,13 +15,13 @@ import (
 )
 
 type DepartmentHandler struct {
-	service service.PermissionsService
+	service service.DepartmentService
 	log     *log.LoggerWithContext
 	clients *container.Clients
 }
 
 func NewDepartmentHandler(
-	s service.PermissionsService,
+	s service.DepartmentService,
 	l *log.LoggerWithContext,
 	clients *container.Clients,
 ) *DepartmentHandler {
@@ -45,11 +46,12 @@ func ProviderDepartmentHandler(container *dig.Container) {
 // @Success 200  {object} dto.Response[any]
 // @Router /api/department [post]
 func (h *DepartmentHandler) Create(c *gin.Context) {
-	var body *dto.ReqPermissions
+	var body *dto.DepartmentBody
 	if err := c.ShouldBindJSON(&body); err != nil {
 		errs.FailWithJSON(c, err)
 		return
 	}
+	fmt.Printf("=====%+v====", body)
 	if len(body.Name) == 0 {
 		errs.FailWithJSON(c, errs.New("name不能为空"))
 		return

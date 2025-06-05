@@ -154,7 +154,9 @@ definitions:
         items:
           $ref: '#/definitions/model.Department'
         type: array
-      created_at:
+      created_time;autoCreateTime:
+        type: string
+      description:
         type: string
       id:
         type: integer
@@ -169,7 +171,7 @@ definitions:
       status:
         description: 1=启用，0=禁用
         type: integer
-      updated_at:
+      updated_time;autoUpdateTime:
         type: string
       users:
         description: 多对多关联
