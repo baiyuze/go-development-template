@@ -6,8 +6,6 @@ import (
 	"app/internal/dto"
 	"app/internal/grpc/container"
 	"app/internal/service"
-	"app/utils"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/dig"
 	"net/http"
@@ -51,7 +49,6 @@ func (h *DepartmentHandler) Create(c *gin.Context) {
 		errs.FailWithJSON(c, err)
 		return
 	}
-	fmt.Printf("=====%+v====", body)
 	if len(body.Name) == 0 {
 		errs.FailWithJSON(c, errs.New("name不能为空"))
 		return
@@ -71,7 +68,7 @@ func (h *DepartmentHandler) Create(c *gin.Context) {
 // @Success 200  {object} dto.Response[any]
 // @Router /api/department [put]
 func (h *DepartmentHandler) Update(c *gin.Context) {
-	var body *dto.ReqPermissions
+	var body *dto.DepartmentBody
 	var permissionId int
 	id := c.Param("id")
 	if len(id) != 0 {
@@ -97,23 +94,18 @@ func (h *DepartmentHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.Ok[any](nil))
 }
 
-// List 查询
+// List tree查询
 // @Summary 查询
 // @Tags 部门
 // @Accept  json
-// @Param pageNum query int false "页码"
-// @Param pageSize query int false "每页数量"
 // @Success 200  {object} dto.Response[dto.List[model.Permission]]
 // @Router /api/department [get]
 func (h *DepartmentHandler) List(c *gin.Context) {
-	pageNum := c.Query("pageNum")
-	pageSize := c.Query("pageSize")
-
-	result, err := h.service.List(c, utils.HandleQuery(pageNum, pageSize))
+	tree, err := h.service.Tree(c)
 	if err != nil {
 		errs.FailWithJSON(c, err)
 	} else {
-		c.JSON(http.StatusOK, dto.Ok(result.Data))
+		c.JSON(http.StatusOK, dto.Ok(tree))
 	}
 }
 

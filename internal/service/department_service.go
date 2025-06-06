@@ -12,8 +12,8 @@ import (
 type DepartmentService interface {
 	Create(c *gin.Context, body *dto.DepartmentBody) error
 	Delete(c *gin.Context, body *dto.DeleteIds) error
-	List(context *gin.Context, query dto.ListQuery) (dto.Result[dto.List[model.Permission]], error)
-	Update(c *gin.Context, id int, body *dto.ReqPermissions) error
+	Tree(context *gin.Context) ([]*model.Department, error)
+	Update(c *gin.Context, id int, body *dto.DepartmentBody) error
 }
 
 type departmentService struct {
@@ -35,9 +35,21 @@ func ProvideDepartmentService(container *dig.Container) {
 }
 
 func (s *departmentService) Create(c *gin.Context, body *dto.DepartmentBody) error {
-	if err := s.db.Create(&model.Permission{
+	var count int64
+	var parentId = 0
+	if err := s.db.Model(&model.Department{}).Count(&count).Error; err != nil {
+		return err
+	}
+
+	if body.ParentId != nil {
+		parentId = *body.ParentId
+	}
+
+	if err := s.db.Create(&model.Department{
 		Name:        body.Name,
 		Description: body.Description,
+		Sort:        int(count + 1),
+		ParentID:    parentId,
 	}).Error; err != nil {
 		return err
 	}
@@ -45,49 +57,60 @@ func (s *departmentService) Create(c *gin.Context, body *dto.DepartmentBody) err
 }
 
 func (s *departmentService) Delete(c *gin.Context, body *dto.DeleteIds) error {
-	//先清空关联关系，然后再删除
-	// 查找权限列表
-	var permissions []model.Permission
-	if err := s.db.Find(&permissions, body.Ids).Error; err != nil {
+	var departments []model.Department
+	if err := s.db.Find(&departments, body.Ids).Error; err != nil {
 		return err
 	}
 
-	if err := s.db.Model(&permissions).Association("Roles").Clear(); err != nil {
+	if err := s.db.Model(&departments).Association("Users").Clear(); err != nil {
 		return err
 	}
-	if err := s.db.Delete(&model.Permission{}, body.Ids).Error; err != nil {
+	if err := s.db.Delete(&departments).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-// List 列表
-func (s *departmentService) List(
+// Tree 列表
+// 应该返回tree结构
+func (s *departmentService) Tree(
 	context *gin.Context,
-	query dto.ListQuery,
-) (dto.Result[dto.List[model.Permission]], error) {
-	var permissions []model.Permission
-	limit := query.PageSize
-	offset := query.PageNum*query.PageSize - query.PageSize
-	if err := s.db.
-		Limit(limit).
-		Offset(offset).
-		Find(&permissions).Error; err != nil {
-		return dto.ServiceFail[dto.List[model.Permission]](nil), err
+) ([]*model.Department, error) {
+	var tree []*model.Department
+	var nodeMap = make(map[int]*model.Department)
+	var departments []model.Department
+	if err := s.db.Find(&departments).Error; err != nil {
+		return nil, err
 	}
-	return dto.ServiceSuccess(dto.List[model.Permission]{
-		Items:    permissions,
-		PageSize: query.PageSize,
-		PageNum:  query.PageNum,
-		Total:    1,
-	}), nil
+	// 构造map
+	for index, department := range departments {
+		node := &departments[index]
+		node.Children = []*model.Department{}
+		nodeMap[department.ID] = node
+	}
+	//转换tree
+	for index, department := range departments {
+		var parentId = department.ParentID
+		node := &departments[index]
+		if parentId == 0 {
+			tree = append(tree, node)
+		} else {
+			parentNode := nodeMap[parentId]
+			parentNode.Children = append(parentNode.Children, node)
+
+		}
+	}
+
+	return tree, nil
 }
-func (s *departmentService) Update(c *gin.Context, id int, body *dto.ReqPermissions) error {
-	if err := s.db.Model(&model.Permission{
+func (s *departmentService) Update(c *gin.Context, id int, body *dto.DepartmentBody) error {
+
+	if err := s.db.Model(&model.Department{
 		ID: id,
-	}).Updates(&model.Permission{
+	}).Updates(&model.Department{
 		Name:        body.Name,
 		Description: body.Description,
+		ParentID:    *body.ParentId,
 	}).Error; err != nil {
 		return err
 	}
