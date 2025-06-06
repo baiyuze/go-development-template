@@ -24,20 +24,6 @@ const docTemplate = `{
                     "部门"
                 ],
                 "summary": "查询",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "页码",
-                        "name": "pageNum",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "每页数量",
-                        "name": "pageSize",
-                        "in": "query"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -744,7 +730,7 @@ const docTemplate = `{
                         "$ref": "#/definitions/model.Department"
                     }
                 },
-                "created_time;autoCreateTime": {
+                "created_time": {
                     "type": "string"
                 },
                 "description": {
@@ -768,7 +754,7 @@ const docTemplate = `{
                     "description": "1=启用，0=禁用",
                     "type": "integer"
                 },
-                "updated_time;autoUpdateTime": {
+                "updated_time": {
                     "type": "string"
                 },
                 "users": {

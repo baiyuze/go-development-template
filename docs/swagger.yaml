@@ -154,7 +154,7 @@ definitions:
         items:
           $ref: '#/definitions/model.Department'
         type: array
-      created_time;autoCreateTime:
+      created_time:
         type: string
       description:
         type: string
@@ -171,7 +171,7 @@ definitions:
       status:
         description: 1=启用，0=禁用
         type: integer
-      updated_time;autoUpdateTime:
+      updated_time:
         type: string
       users:
         description: 多对多关联
@@ -262,15 +262,6 @@ paths:
     get:
       consumes:
       - application/json
-      parameters:
-      - description: 页码
-        in: query
-        name: pageNum
-        type: integer
-      - description: 每页数量
-        in: query
-        name: pageSize
-        type: integer
       responses:
         "200":
           description: OK
