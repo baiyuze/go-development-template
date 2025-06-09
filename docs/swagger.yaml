@@ -292,6 +292,18 @@ paths:
       summary: 更新
       tags:
       - 部门
+  /api/department/:id/users:
+    delete:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response-any'
+      summary: 绑定用户到部门
+      tags:
+      - 部门
   /api/permissions:
     delete:
       consumes:

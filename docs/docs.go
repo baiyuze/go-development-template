@@ -85,6 +85,25 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/department/:id/users": {
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "部门"
+                ],
+                "summary": "绑定用户到部门",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response-any"
+                        }
+                    }
+                }
+            }
+        },
         "/api/permissions": {
             "get": {
                 "consumes": [
