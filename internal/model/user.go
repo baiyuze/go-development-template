@@ -7,8 +7,8 @@ import (
 type User struct {
 	ID          int           `gorm:"primaryKey;autoIncrement" json:"id"`
 	Name        string        `gorm:"type:char(30);not null" json:"name"`
-	Account     string        `gorm:"type:char(30);not null;uniqueIndex" json:"account"`
-	CreateTime  time.Time     `gorm:"type:datetime(6);" json:"createTime"`
+	Account     string        `gorm:"type:char(30);not null;uniqueIndex:idx_account_create_time,sort:asc" json:"account"`
+	CreateTime  time.Time     `gorm:"type:datetime(6);uniqueIndex:idx_account_create_time,sort:asc;index" json:"createTime"`
 	Password    *string       `gorm:"type:varchar(255);not null" json:"password,omitempty"`
 	Roles       []*Role       `gorm:"many2many:user_roles"`
 	Departments []*Department `gorm:"many2many:user_departments;" json:"departments,omitempty"`
