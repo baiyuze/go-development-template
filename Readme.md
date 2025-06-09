@@ -171,8 +171,8 @@ router.GET("/auth", middleware.Jwt(true), userHandler.TestAuth)
 
     •	✅ 用户鉴权中间件（JWT）(已完成)
     •	✅ 用户权限 (已完成)
-    •	⏳ 部门管理 (已完成)
-    •	⏳ 字典管理 (规划中..)
+    •	✅ 部门管理 (已完成)
+    •	✅ 字典管理 (规划中..)
     •	⏳ Kafka 消息队列集成 (规划中..)
 ⸻
 
