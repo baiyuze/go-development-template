@@ -85,8 +85,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/department/:id/users": {
-            "delete": {
+        "/api/department/{id}/users": {
+            "post": {
                 "consumes": [
                     "application/json"
                 ],

@@ -292,8 +292,8 @@ paths:
       summary: 更新
       tags:
       - 部门
-  /api/department/:id/users:
-    delete:
+  /api/department/{id}/users:
+    post:
       consumes:
       - application/json
       responses:
