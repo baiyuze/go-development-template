@@ -22,6 +22,8 @@ func RegisterDepartmentRoutes(r *gin.RouterGroup, container *dig.Container) {
 		router.DELETE("/", middleware.Jwt(true), departmentsHandler.Delete)
 		// 修改
 		router.PUT("/:id", middleware.Jwt(true), departmentsHandler.Update)
+		// 绑定用户
+		router.POST("/:id/users", middleware.Jwt(true), departmentsHandler.BindUser)
 	})
 	if err != nil {
 		fmt.Printf("注入 handler 失败: %v\n", err)

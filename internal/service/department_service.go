@@ -4,6 +4,7 @@ import (
 	"app/internal/common/log"
 	"app/internal/dto"
 	"app/internal/model"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/dig"
 	"gorm.io/gorm"
@@ -14,6 +15,7 @@ type DepartmentService interface {
 	Delete(c *gin.Context, body *dto.DeleteIds) error
 	Tree(context *gin.Context) ([]*model.Department, error)
 	Update(c *gin.Context, id int, body *dto.DepartmentBody) error
+	UpdateUsers(c *gin.Context, id int, body *dto.UsersIds) error
 }
 
 type departmentService struct {
@@ -79,7 +81,9 @@ func (s *departmentService) Tree(
 	var tree []*model.Department
 	var nodeMap = make(map[int]*model.Department)
 	var departments []model.Department
-	if err := s.db.Find(&departments).Error; err != nil {
+	if err := s.db.Preload("Users", func(db *gorm.DB) *gorm.DB {
+		return db.Select("users.name", "users.id", "users.email", "users.phone", "users.create_time", "users.update_time")
+	}).Find(&departments).Error; err != nil {
 		return nil, err
 	}
 	// 构造map
@@ -112,6 +116,23 @@ func (s *departmentService) Update(c *gin.Context, id int, body *dto.DepartmentB
 		Description: body.Description,
 		ParentID:    *body.ParentId,
 	}).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *departmentService) UpdateUsers(c *gin.Context, id int, body *dto.UsersIds) error {
+	var department model.Department
+	var users []model.User
+	if err := s.db.First(&department, id).Error; err != nil {
+		return err
+	}
+
+	if err := s.db.Find(&users, body.Ids).Error; err != nil {
+		return err
+	}
+
+	if err := s.db.Model(&department).Association("Users").Replace(&users); err != nil {
 		return err
 	}
 	return nil

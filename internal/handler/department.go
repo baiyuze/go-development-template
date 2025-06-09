@@ -128,3 +128,30 @@ func (h *DepartmentHandler) Delete(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, dto.Ok[any](nil))
 }
+
+// BindUser 绑定用户到部门
+// @Summary 绑定用户到部门
+// @Tags 部门
+// @Accept  json
+// @Params data body dto.DeleteIds
+// @Success 200  {object} dto.Response[any]
+// @Router /api/department/:id/users [delete]
+func (h *DepartmentHandler) BindUser(c *gin.Context) {
+	var ids dto.UsersIds
+	paramsId := c.Param("id")
+	id, err := strconv.Atoi(paramsId)
+	if err != nil {
+		errs.FailWithJSON(c, err)
+		return
+	}
+
+	if err := c.ShouldBindJSON(&ids); err != nil {
+		errs.FailWithJSON(c, err)
+	}
+
+	if err := h.service.UpdateUsers(c, id, &ids); err != nil {
+		errs.FailWithJSON(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, dto.Ok[any](nil))
+}

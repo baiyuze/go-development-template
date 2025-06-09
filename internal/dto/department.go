@@ -6,3 +6,7 @@ type DepartmentBody struct {
 	ParentId    *int   `json:"parentId,omitempty"`
 	Description string `json:"description,omitempty"`
 }
+
+type UsersIds struct {
+	Ids []int `json:"ids"`
+}
