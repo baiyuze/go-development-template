@@ -12,7 +12,7 @@ type Department struct {
 	Status      uint8     `gorm:"type:tinyint;default:1;" json:"status"` // 1=启用，0=禁用
 	CreatedTime time.Time `gorm:"type:datetime(6);autoCreateTime" json:"created_time"`
 	UpdateTime  time.Time `gorm:"type:datetime(6);autoUpdateTime" json:"updated_time"`
-	Description string    `gorm:"description" json:"description"`
+	Description string    `gorm:"type:varchar(200);description" json:"description"`
 	// 多对多关联
 	Users []*User `gorm:"many2many:user_departments;" json:"users,omitempty"`
 

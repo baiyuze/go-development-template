@@ -6,9 +6,9 @@ import (
 
 type Permission struct {
 	ID          int       `gorm:"primaryKey;autoIncrement" json:"id"`
-	Name        string    `gorm:"type:char(30);not null" json:"name"`
+	Name        string    `gorm:"type:varchar(30);not null" json:"name"`
 	Roles       []*Role   `gorm:"many2many:role_permissions"`
-	Description string    `gorm:"type:char(30);" json:"description"`
+	Description string    `gorm:"type:varchar(200);" json:"description"`
 	CreateTime  time.Time `gorm:"type:datetime(6);autoUpdateTime" json:"createTime"`
 	UpdateTime  time.Time `gorm:"type:datetime(6);autoUpdateTime" json:"updateTime"`
 }

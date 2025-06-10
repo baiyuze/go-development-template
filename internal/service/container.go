@@ -7,4 +7,6 @@ func Provide(container *dig.Container) {
 	ProvideRolesService(container)
 	ProvidePermissionsService(container)
 	ProvideDepartmentService(container)
+	ProvideDictService(container)
+	
 }

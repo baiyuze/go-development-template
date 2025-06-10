@@ -8,4 +8,5 @@ func Provide(container *dig.Container) {
 	ProviderRolesHandler(container)
 	ProviderPermissionsHandler(container)
 	ProviderDepartmentHandler(container)
+	ProviderDictHandler(container)
 }
