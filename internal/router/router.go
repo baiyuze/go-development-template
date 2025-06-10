@@ -24,5 +24,6 @@ func RegisterRoutes(r *gin.Engine, container *dig.Container) {
 	RegisterRolesRoutes(route, container)
 	RegisterPermissionsRoutes(route, container)
 	RegisterDepartmentRoutes(route, container)
+	RegisterDictRoutes(route, container)
 
 }

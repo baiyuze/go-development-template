@@ -9,8 +9,8 @@ import (
 	"go.uber.org/dig"
 )
 
-// RegisterDicttRoutes 注册所有路由
-func RegisterDicttRoutes(r *gin.RouterGroup, container *dig.Container) {
+// RegisterDictRoutes 注册所有路由
+func RegisterDictRoutes(r *gin.RouterGroup, container *dig.Container) {
 
 	router := r.Group("dict")
 	err := container.Invoke(func(dictHandler *handler.DictHandler) {
