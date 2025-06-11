@@ -7,14 +7,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/dig"
 	"gorm.io/gorm"
-	"time"
 )
 
 type DictService interface {
-	Create(c *gin.Context, body *dto.DepartmentBody) error
+	Create(c *gin.Context, body *model.Dict) error
 	Delete(c *gin.Context, body dto.DeleteIds) error
-	List(context *gin.Context, query dto.ListQuery) (dto.Result[dto.List[model.Department]], error)
-	Update(c *gin.Context, id int, body *dto.DepartmentBody) error
+	List(context *gin.Context, query dto.ListQuery, name string) (dto.Result[dto.List[model.Dict]], error)
+	Update(c *gin.Context, id int, body *model.Dict) error
+	GetOptionsByDictCode(c *gin.Context, code string) ([]*model.DictItem, error)
 }
 
 type dictService struct {
@@ -35,62 +35,77 @@ func ProvideDictService(container *dig.Container) {
 	}
 }
 
-func (s *dictService) GetUserOne() (*model.User, error) {
-	var user model.User
-	if err := s.db.First(&user).Error; err != nil {
-		return nil, err
-	}
-	return &user, nil
-}
-
 // Create 创建
-func (s *dictService) Create(c *gin.Context, body *dto.DepartmentBody) error {
+func (s *dictService) Create(c *gin.Context, body *model.Dict) error {
+	if err := s.db.Transaction(func(tx *gorm.DB) error {
+		// 添加数据到dict
+		if err := tx.Create(&model.Dict{
+			Name:        body.Name,
+			Code:        body.Code,
+			En:          body.En,
+			Description: body.Description,
+		}).Error; err != nil {
+			return err
+		}
+		// 添加数据到dict_items
+		for _, item := range body.Items {
+			if err := tx.Create(&model.DictItem{
+				DictCode: body.Code,
+				Value:    item.Value,
+				LabelZh:  item.LabelZh,
+				LabelEn:  item.LabelEn,
+				Status:   item.Status,
+			}).Error; err != nil {
+				return err
+			}
+		}
 
-	//logger := s.log.WithContext(c)
-	result := s.db.Create(&model.Role{
-		Name:        body.Name,
-		Description: body.Description,
-		CreateTime:  time.Now(),
-	})
-
-	if result.Error != nil {
-		return result.Error
+		return nil
+	}); err != nil {
+		return err
 	}
-
 	return nil
 }
 
-// List 获取所有的用户数据
-func (s *dictService) List(c *gin.Context, query dto.ListQuery) (dto.Result[dto.List[model.Department]], error) {
+// List 根据不同的code获取不同的options
+func (s *dictService) List(c *gin.Context, query dto.ListQuery, name string) (dto.Result[dto.List[model.Dict]], error) {
 	logger := s.log.WithContext(c)
-	var roles []model.Department
+	var dicts []model.Dict
 	limit := query.PageSize
 	offset := query.PageNum*query.PageSize - query.PageSize
 
 	if result := s.db.
+		Where("name LIKE ?", "%"+name+"%").
+		Preload("Items").
 		Limit(limit).
 		Offset(offset).
 		Order("create_time asc").
-		//不需要查询所有的角色用户
-		//.Preload("Users", func(db *gorm.DB) *gorm.DB {
-		//	return db.Select("users.name", "users.id", "users.email", "users.phone", "users.create_time", "users.update_time")
-		//})
-		Find(&roles); result.Error != nil {
+		Find(&dicts); result.Error != nil {
 		logger.Error(result.Error.Error())
-		return dto.ServiceFail[dto.List[model.Department]](result.Error), result.Error
+		return dto.ServiceFail[dto.List[model.Dict]](result.Error), result.Error
 	}
 	var count int64
-	if result := s.db.Model(&model.Department{}).Count(&count); result.Error != nil {
+	if result := s.db.Model(&model.Dict{}).Count(&count); result.Error != nil {
 		logger.Error(result.Error.Error())
-		return dto.ServiceFail[dto.List[model.Department]](result.Error), result.Error
+		return dto.ServiceFail[dto.List[model.Dict]](result.Error), result.Error
 	}
-	data := dto.ServiceSuccess(dto.List[model.Department]{
-		Items:    roles,
+	data := dto.ServiceSuccess(dto.List[model.Dict]{
+		Items:    dicts,
 		PageSize: query.PageSize,
 		PageNum:  query.PageNum,
 		Total:    count,
 	})
 	return data, nil
+}
+
+// GetOptionsByDictCode 根据不同的code获取不同的options
+func (s *dictService) GetOptionsByDictCode(c *gin.Context, code string) ([]*model.DictItem, error) {
+	var dictItems []*model.DictItem
+	if err := s.db.Where("dict_code = ?", code).Find(&dictItems).Error; err != nil {
+		return nil, err
+	}
+
+	return dictItems, nil
 }
 
 // Delete 删除
@@ -124,8 +139,56 @@ func updateInfo(db *gorm.DB, id int, body *dto.Role) error {
 	return nil
 }
 
-// Update 更新角色和关联关系，包括权限ID和用户ID
-func (s *dictService) Update(c *gin.Context, id int, body *dto.DepartmentBody) error {
+// Update 更新字典数据,需要使用事务
+func (s *dictService) Update(c *gin.Context, id int, body *model.Dict) error {
+	err := s.db.Transaction(func(tx *gorm.DB) error {
+		var dict model.Dict
+		if err := tx.First(&dict, id).Error; err != nil {
+			return err
+		}
+		//更新关系，先清空再更新
+		// 不允许clear是因为外键不能为null导致的
+		//if err := tx.Model(&dict).Association("Items").Clear(); err != nil {
+		//	return err
+		//}
+		//	先更新id数据，再更新关联关系
+		if err :=
+			tx.Model(&dict).Updates(model.Dict{
+				Name:        body.Name,
+				En:          body.En,
+				Code:        body.Code,
+				Description: body.Description,
+			}).Error; err != nil {
+			return nil
+		}
 
+		if body.Items != nil {
+			for _, item := range body.Items {
+				dictItems := model.DictItem{
+					DictCode: body.Code,
+					Value:    item.Value,
+					LabelZh:  item.LabelZh,
+					LabelEn:  item.LabelEn,
+					Status:   item.Status,
+				}
+				if item.ID != 0 {
+					if err := tx.Model(&model.DictItem{
+						ID: item.ID,
+					}).Updates(&dictItems).Error; err != nil {
+						return err
+					}
+				} else {
+					if err := tx.Create(&dictItems).Error; err != nil {
+						return err
+					}
+				}
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }

@@ -6,6 +6,21 @@ definitions:
           type: integer
         type: array
     type: object
+  dto.List-array_model_Dict:
+    properties:
+      items:
+        items:
+          items:
+            $ref: '#/definitions/model.Dict'
+          type: array
+        type: array
+      pageNum:
+        type: integer
+      pageSize:
+        type: integer
+      total:
+        type: integer
+    type: object
   dto.List-dto_UserWithRole:
     properties:
       items:
@@ -70,6 +85,28 @@ definitions:
       code:
         type: integer
       data: {}
+      err: {}
+      message:
+        type: string
+    type: object
+  dto.Response-array_model_DictItem:
+    properties:
+      code:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/model.DictItem'
+        type: array
+      err: {}
+      message:
+        type: string
+    type: object
+  dto.Response-dto_List-array_model_Dict:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/dto.List-array_model_Dict'
       err: {}
       message:
         type: string
@@ -178,6 +215,49 @@ definitions:
         items:
           $ref: '#/definitions/model.User'
         type: array
+    type: object
+  model.Dict:
+    properties:
+      code:
+        type: string
+      createTime:
+        type: string
+      description:
+        type: string
+      en:
+        type: string
+      id:
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/model.DictItem'
+        type: array
+      name:
+        type: string
+      updateTime:
+        type: string
+    type: object
+  model.DictItem:
+    properties:
+      dictCode:
+        description: 外键，关联 Dict
+        type: string
+      id:
+        type: integer
+      labelEn:
+        description: 英文名称
+        type: string
+      labelZh:
+        description: 中文名称
+        type: string
+      sort:
+        type: integer
+      status:
+        description: 启用状态
+        type: string
+      value:
+        description: 数据值，系统用的
+        type: string
     type: object
   model.Permission:
     properties:
@@ -304,6 +384,106 @@ paths:
       summary: 绑定用户到部门
       tags:
       - 部门
+  /api/dicts:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: 删除ids
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DeleteIds'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response-any'
+      summary: 删除
+      tags:
+      - 字典管理
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 页码
+        in: query
+        name: pageNum
+        type: integer
+      - description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      - description: 字典名称
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response-dto_List-array_model_Dict'
+      summary: 查询字典列表
+      tags:
+      - 字典管理
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: body
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/model.Dict'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response-any'
+      summary: 创建
+      tags:
+      - 字典管理
+  /api/dicts/{code}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 字典编码
+        in: query
+        name: code
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response-array_model_DictItem'
+      summary: 根据Code获取options
+      tags:
+      - 字典管理
+  /api/dicts/{id}:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: body
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/model.Dict'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response-any'
+      summary: 更新
+      tags:
+      - 字典管理
   /api/permissions:
     delete:
       consumes:
