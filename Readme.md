@@ -4,6 +4,27 @@
 这是一个现代化、高可维护性的 Go 微服务架构模板，基于 Gin、gRPC、GORM、Consul，并通过 [dig](https://github.com/uber-go/dig) 实现依赖注入，提升模块解耦与测试友好性，支持 HTTP 与 gRPC 双协议访问。
 
 ***
+## 目录
+
+- [🚀 Go 微服务框架模板（Gin + GRPC + Consul + Gorm + dig）](#-go-微服务框架模板gin--grpc--consul--gorm--dig)
+- [🧱 项目结构概览](#-项目结构概览)
+- [💡 技术栈与特点](#-技术栈与特点)
+- [🚀 启动方式](#-启动方式)
+    - [1. 安装依赖：](#1-安装依赖)
+    - [2. 启动服务：](#2-启动服务)
+- [🧬 核心架构说明](#-核心架构说明)
+    - [依赖注入（dig 容器）](#依赖注入dig-容器)
+    - [配置系统](#配置系统)
+    - [🧰 数据访问层](#-数据访问层)
+    - [⚙️ gRPC 模块](#️-grpc-模块)
+- [🧪 API 示例](#-api-示例)
+    - [REST 接口（HTTP）](#rest-接口http)
+    - [gRPC 接口](#grpc-接口)
+- [⚙️ 环境变量支持](#️-环境变量支持)
+- [路由使用](#路由使用传递-middlewarejwtfalsetrue-来确定是否使用jwt认证)
+- [📌 后续规划（TODO）](#-后续规划todo)
+- [权限表设计](#权限表设计)
+- [📄 License](#-license)
 
 [接口文档](./docs/swagger.json)
 
@@ -127,7 +148,7 @@ REST 接口（HTTP）
 GET 示例：
 
 ```bash
-curl http://localhost:8888/user/test
+curl http://localhost:8888/api/user/test
 ```
 
 返回：
