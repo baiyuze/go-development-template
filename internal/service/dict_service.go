@@ -110,21 +110,23 @@ func (s *dictService) GetOptionsByDictCode(c *gin.Context, code string) ([]*mode
 
 // Delete 删除
 func (s *dictService) Delete(c *gin.Context, body dto.DeleteIds) error {
-	var roles []model.Role
-	if err := s.db.Find(&roles, body.Ids).Error; err != nil {
+	var dicts []model.Dict
+	if err := s.db.Preload("Items").Find(&dicts, body.Ids).Error; err != nil {
 		return err
 	}
-	// 清除权限关联
-	if err := s.db.Model(&roles).Association("Permissions").Clear(); err != nil {
-		return err
+	// 如果想删除主表记录同步删除从表记录，需要设置constraint:OnDelete:CASCADE
+	// 当前采用先删除从表，再删除主表记录
+	for _, dict := range dicts {
+		for _, item := range dict.Items {
+			if err := s.db.Delete(&item).Error; err != nil {
+				return err
+			}
+		}
+		if err := s.db.Delete(&dict).Error; err != nil {
+			return err
+		}
 	}
-	// 清除用户关联
-	if err := s.db.Model(&roles).Association("Users").Clear(); err != nil {
-		return err
-	}
-	if len(body.Ids) != 0 {
-		s.db.Delete(&roles, body.Ids)
-	}
+
 	return nil
 }
 

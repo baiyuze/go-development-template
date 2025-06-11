@@ -12,7 +12,7 @@ type Dict struct {
 	Description string      `gorm:"type:varchar(200)" json:"description"`
 	CreateTime  time.Time   `gorm:"type:datetime(6);autoUpdateTime;index" json:"createTime"`
 	UpdateTime  time.Time   `gorm:"type:datetime(6);autoUpdateTime" json:"updateTime"`
-	Items       []*DictItem `gorm:"foreignKey:DictCode;references:Code" json:"items"`
+	Items       []*DictItem `gorm:"foreignKey:DictCode;references:Code;" json:"items"`
 }
 
 func (Dict) TableName() string {
