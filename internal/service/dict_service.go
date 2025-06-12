@@ -130,17 +130,6 @@ func (s *dictService) Delete(c *gin.Context, body dto.DeleteIds) error {
 	return nil
 }
 
-// updateRoleInfo 更新数据表字段
-func updateInfo(db *gorm.DB, id int, body *dto.Role) error {
-	if err := db.Model(&model.Role{}).Where("id = ?", id).Updates(&model.Role{
-		Name:        body.Name,
-		Description: body.Description,
-	}).Error; err != nil {
-		return err
-	}
-	return nil
-}
-
 // Update 更新字典数据,需要使用事务
 func (s *dictService) Update(c *gin.Context, id int, body *model.Dict) error {
 	err := s.db.Transaction(func(tx *gorm.DB) error {
