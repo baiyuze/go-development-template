@@ -21,7 +21,7 @@ type ServiceDiscovery struct {
 	client *api.Client
 }
 
-// 初始化发现器
+// NewServiceDiscovery 初始化发现器
 func NewServiceDiscovery() *ServiceDiscovery {
 
 	config := api.DefaultConfig()
@@ -37,7 +37,7 @@ func NewServiceDiscovery() *ServiceDiscovery {
 	return &ServiceDiscovery{client: client}
 }
 
-// 获取服务地址（只查一次）
+// GetServiceAddress 获取服务地址（只查一次）
 func (d *ServiceDiscovery) GetServiceAddress(serviceName string) (string, error) {
 	services, err := d.client.Agent().Services()
 	if err != nil {
